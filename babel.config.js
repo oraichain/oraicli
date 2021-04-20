@@ -3,13 +3,7 @@
 module.exports = (api) => {
   api.cache(true);
   return {
-    presets: [require('@babel/preset-env'), require('@babel/preset-flow')],
-    plugins: ['@babel/plugin-transform-runtime'],
-    overrides: [
-      {
-        test: './src/messages',
-        compact: true
-      }
-    ]
+    presets: ['@babel/preset-env', '@babel/preset-flow'],
+    plugins: ['@babel/plugin-transform-runtime']
   };
 };

@@ -2,6 +2,8 @@ import { Argv } from 'yargs';
 import bech32 from 'bech32';
 import Cosmos from '@oraichain/cosmosjs';
 
+declare var cosmos: Cosmos;
+
 export default async (yargs: Argv) => {
   const { argv } = yargs
     .positional('name', {
@@ -21,9 +23,7 @@ export default async (yargs: Argv) => {
       type: 'string'
     });
 
-  const cosmos = new Cosmos(argv.url, argv.chainId);
   const message = Cosmos.message;
-  cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
 
   const [name, description, contractAddress] = argv._.slice(-3);
@@ -35,7 +35,7 @@ export default async (yargs: Argv) => {
     description,
     contract: contractAddress,
     owner: accAddress,
-    fees: fees === "" ? "0orai" : fees,
+    fees: fees === '' ? '0orai' : fees
   });
 
   const msgSendAny = new message.google.protobuf.Any({

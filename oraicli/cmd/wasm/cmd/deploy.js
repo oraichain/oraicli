@@ -2,6 +2,8 @@ import { Argv } from 'yargs';
 import fs from 'fs';
 import Cosmos from '@oraichain/cosmosjs';
 
+declare var cosmos: Cosmos;
+
 const message = Cosmos.message;
 
 const getStoreMessage = (wasm_byte_code, sender) => {
@@ -55,23 +57,20 @@ export default async (yargs: Argv) => {
 
   const [file] = argv._.slice(-1);
 
-  const cosmos = new Cosmos(argv.url, argv.chainId);
-
-  cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
 
   const wasmBody = fs.readFileSync(file).toString('base64');
 
   const txBody1 = getStoreMessage(wasmBody, sender);
-  console.log("argv fees: ", argv)
+  console.log('argv fees: ', argv);
   const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 2000000);
 
-  console.log("res1: ", res1)
+  console.log('res1: ', res1);
 
   if (res1.tx_response.code !== 0) {
-    console.log("response: ", res1)
-  };
+    console.log('response: ', res1);
+  }
 
   // next instantiate code
   const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
@@ -80,8 +79,8 @@ export default async (yargs: Argv) => {
   const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
 
   console.log(res2);
-  let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value
-  console.log("contract address: ", address)
+  let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value;
+  console.log('contract address: ', address);
   fs.writeFileSync('./address.txt', address);
 };
 

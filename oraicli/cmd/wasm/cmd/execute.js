@@ -1,6 +1,7 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 
+declare var cosmos: Cosmos;
 const message = Cosmos.message;
 
 const getHandleMessage = (contract, msg, sender) => {
@@ -27,9 +28,6 @@ export default async (yargs: Argv) => {
   });
   const [address] = argv._.slice(-1);
 
-  const cosmos = new Cosmos(argv.url, argv.chainId);
-
-  cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
 

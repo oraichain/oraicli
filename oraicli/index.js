@@ -1,9 +1,14 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
-dotenv.config({ silent: process.env.NODE_ENV === 'development' });
+import Cosmos from '@oraichain/cosmosjs';
 
-yargs(hideBin(process.argv))
+dotenv.config({ silent: process.env.NODE_ENV === 'development' });
+// global
+global.cosmos = new Cosmos(process.env.URL, process.env.CHAIN_ID || 'Oraichain');
+cosmos.setBech32MainPrefix('orai');
+
+const argv = yargs(hideBin(process.argv))
   .alias('help', 'h')
   .alias('version', 'v')
   .command('send [address]', 'send orai token', require('./cmd/send/index').default)
@@ -14,15 +19,7 @@ yargs(hideBin(process.argv))
   .command('provider', 'update provider data', require('./cmd/provider').default)
   .command('airequest', 'airequest commands', require('./cmd/airequest').default)
   .command('distr', 'distribution commands', require('./cmd/distr').default)
-  .option('chain-id', {
-    type: 'string',
-    default: 'Oraichain'
-  })
   .option('mnemonic', {
     type: 'string',
     default: process.env.SEND_MNEMONIC
-  })
-  .option('url', {
-    default: process.env.URL,
-    type: 'string'
   }).argv;

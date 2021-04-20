@@ -1,4 +1,6 @@
 import { Argv } from 'yargs';
+import Cosmos from '@oraichain/cosmosjs';
+declare var cosmos: Cosmos;
 
 export default async (yargs: Argv) => {
   const { argv } = yargs.positional('address', {
@@ -7,7 +9,7 @@ export default async (yargs: Argv) => {
   });
   const [address] = argv._.slice(-1);
   try {
-    const data = await fetch(`${argv.url}/cosmos/bank/v1beta1/balances/${address}`).then((res) => res.json());
+    const data = await cosmos.get(`/cosmos/bank/v1beta1/balances/${address}`);
 
     console.log(data);
   } catch (ex) {

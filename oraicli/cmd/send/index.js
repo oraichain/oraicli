@@ -23,7 +23,7 @@ export default async (yargs: Argv) => {
   const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
     from_address: cosmos.getAddress(childKey),
     to_address: argv.address,
-    amount: [{ denom: cosmos.bech32MainPrefix, amount: argv.amount }] // 10
+    amount: [{ denom: cosmos.bech32MainPrefix, amount: String(argv.amount) }] // 10
   });
 
   const msgSendAny = new message.google.protobuf.Any({

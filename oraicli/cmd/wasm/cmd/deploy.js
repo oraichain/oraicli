@@ -51,7 +51,11 @@ export default async (yargs: Argv) => {
     .option('fees', {
       describe: 'the transaction fees',
       type: 'string'
-    });
+    })
+    .option('gas', {
+      describe: 'gas limit',
+      type: 'string'
+    })
 
   const [file] = argv._.slice(-1);
 
@@ -60,12 +64,13 @@ export default async (yargs: Argv) => {
   cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
+  const { gas } = argv;
 
   const wasmBody = fs.readFileSync(file).toString('base64');
 
   const txBody1 = getStoreMessage(wasmBody, sender);
   console.log("argv fees: ", argv)
-  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 2000000);
+  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), parseInt(gas));
 
   console.log("res1: ", res1)
 
@@ -77,7 +82,7 @@ export default async (yargs: Argv) => {
   const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
   const input = Buffer.from(argv.input).toString('base64');
   const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
-  const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
+  const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), gas);
 
   console.log(res2);
   let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value

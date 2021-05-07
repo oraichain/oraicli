@@ -74,14 +74,14 @@ export default async (yargs: Argv) => {
 
   // next instantiate code
   const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
-  const input = Buffer.from(argv.input).toString('base64');
+  const input = Buffer.from(argv.input);
   const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
   const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
 
   console.log(res2);
   let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value;
   console.log('contract address: ', address);
-  fs.writeFileSync('./address.txt', address);
+  // fs.writeFileSync('./address.txt', address);
 };
 
 // yarn oraicli wasm deploy ../oraiwasm/smart-contracts/classification/artifacts/classification.wasm --label "classification 14" --input '{}'

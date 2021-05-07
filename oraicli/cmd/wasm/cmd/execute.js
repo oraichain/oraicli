@@ -31,7 +31,7 @@ export default async (yargs: Argv) => {
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
 
-  const input = Buffer.from(argv.input).toString('base64');
+  const input = Buffer.from(argv.input);
 
   const txBody = getHandleMessage(address, input, sender);
   const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));

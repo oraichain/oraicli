@@ -63,10 +63,10 @@ export default async (yargs: Argv) => {
   const wasmBody = fs.readFileSync(file).toString('base64');
 
   const txBody1 = getStoreMessage(wasmBody, sender);
-  console.log('argv fees: ', argv);
-  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 2000000);
+  // console.log('argv fees: ', argv);
+  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
 
-  console.log('res1: ', res1);
+  // console.log('res1: ', res1);
 
   if (res1.tx_response.code !== 0) {
     console.log('response: ', res1);

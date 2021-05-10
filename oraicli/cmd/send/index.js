@@ -15,14 +15,16 @@ export default async (yargs: Argv) => {
       type: 'string'
     });
 
+  const [to_address] = argv._.slice(-1);
+
   const message = Cosmos.message;
   const childKey = cosmos.getChildKey(argv.mnemonic);
-  const address = cosmos.getAddress(argv.mnemonic);
-  console.log('address: ', address);
+  const address = cosmos.getAddress(childKey);
+  console.log('from: ', address);
 
   const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
     from_address: cosmos.getAddress(childKey),
-    to_address: argv.address,
+    to_address,
     amount: [{ denom: cosmos.bech32MainPrefix, amount: argv.amount }] // 10
   });
 

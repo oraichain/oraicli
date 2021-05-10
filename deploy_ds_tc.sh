@@ -36,5 +36,5 @@ do
     sleep 6
 done
 
-# ./deploy_ds_tc.sh datasource classification '' 17 ../oraiwasm/smart-contracts/package/cv 5000orai
-# ./deploy_ds_tc.sh testcase classification_testcase '' 17 ../oraiwasm/smart-contracts/package/cv 5000orai
+# ./deploy_ds_tc.sh datasource classification '' 17 ../oraiwasm/package/cv 5000orai
+# ./deploy_ds_tc.sh testcase classification_testcase '' 17 ../oraiwasm/package/cv 5000orai

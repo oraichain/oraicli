@@ -7,7 +7,7 @@ dotenv.config({ silent: process.env.NODE_ENV === 'production' });
 
 const num = 1000000;
 const nativeAddrCol = 'A';
-const rewardCol = 'H';
+const rewardCol = 'D';
 
 function calculateTotalRewards(sheet) {
   let total = 0.0;

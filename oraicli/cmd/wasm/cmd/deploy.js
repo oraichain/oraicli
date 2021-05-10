@@ -25,7 +25,8 @@ const getInstantiateMessage = (code_id, init_msg, sender, label = '') => {
     code_id,
     init_msg,
     label,
-    sender
+    sender,
+    init_funds: [{ denom: "orai", amount: String(1000) }]
   });
 
   const msgSendAny = new message.google.protobuf.Any({
@@ -54,7 +55,8 @@ export default async (yargs: Argv) => {
     })
     .option('gas', {
       describe: 'gas limit',
-      type: 'string'
+      type: 'string',
+      default: '2000000'
     })
 
   const [file] = argv._.slice(-1);
@@ -90,4 +92,4 @@ export default async (yargs: Argv) => {
   fs.writeFileSync('./address.txt', address);
 };
 
-// yarn oraicli wasm deploy ../oraiwasm/smart-contracts/classification/artifacts/classification.wasm --label "classification 14" --input '{}'
+//yarn oraicli wasm deploy../oraiwasm/smart-contracts/package/plus/aioracle_test/artifacts/aioracle_test.wasm--label "aioracle test" --input '{"dsources":[{"url":"https://100api.orai.dev/cv023","headers":["content-type: application/x-www-form-urlencoded"],"owner":"orai14juztjzu02mzawy8z0623vp5029gx6wmxdfdmu","provider_fees":[{"denom":"orai","amount":"100"}]}],"tcases":[{"url":"https://100api.orai.dev/cv056","headers":["content-type: application/x-www-form-urlencoded"],"owner":"orai14juztjzu02mzawy8z0623vp5029gx6wmxdfdmu","provider_fees":[{"denom":"orai","amount":"150"}]}]}' --gas 4000000

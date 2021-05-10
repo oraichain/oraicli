@@ -22,12 +22,14 @@ const getStoreMessage = (wasm_byte_code, sender) => {
   });
 };
 
-const getInstantiateMessage = (code_id, init_msg, sender, label = '') => {
+const getInstantiateMessage = (code_id, init_msg, sender, label = '', amount = '') => {
+  const sent_funds = amount ? [{ denom: cosmos.bech32MainPrefix, amount }] : null;
   const msgSend = new message.cosmwasm.wasm.v1beta1.MsgInstantiateContract({
     code_id,
     init_msg,
     label,
-    sender
+    sender,
+    sent_funds
   });
 
   const msgSendAny = new message.google.protobuf.Any({
@@ -53,6 +55,8 @@ export default async (yargs: Argv) => {
     .option('fees', {
       describe: 'the transaction fees',
       type: 'string'
+    }).option('amount', {
+      type: 'string'
     });
 
   const [file] = argv._.slice(-1);
@@ -75,7 +79,7 @@ export default async (yargs: Argv) => {
   // next instantiate code
   const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
   const input = Buffer.from(argv.input);
-  const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
+  const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label, argv.amount);
   const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
 
   console.log(res2);

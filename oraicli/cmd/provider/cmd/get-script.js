@@ -1,5 +1,7 @@
 import { Argv } from 'yargs';
 import fs from 'fs';
+import Cosmos from '@oraichain/cosmosjs';
+declare var cosmos: Cosmos;
 
 export default async (yargs: Argv) => {
   const { argv } = yargs
@@ -10,11 +12,11 @@ export default async (yargs: Argv) => {
     .positional('name', {
       describe: 'the script name',
       type: 'string'
-    })
+    });
   const [script, name] = argv._.slice(-2);
-  console.log("script: ", script)
-  const data = await fetch(`${argv.url}/provider/${script}/${name}`).then((res) => res.json());
-  console.log(data)
+  console.log('script: ', script);
+  const data = await cosmos.get(`/provider/${script}/${name}`);
+  console.log(data);
   if (data.code === undefined) {
     fs.writeFileSync('./is_exist.txt', '');
   } else {

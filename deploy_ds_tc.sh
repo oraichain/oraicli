@@ -15,11 +15,11 @@ echo "dir path: $DIR_PATH"
 # deploy smart contract data source and create data source
 for i in "${SCRIPT[@]}"
 do
-    yarn oraicli wasm deploy $DIR_PATH/$i/artifacts/$i.wasm --label "$i $NONCE" --input $INPUT --fees $FEES --chain-id $CHAIN_ID
+    yarn oraicli wasm deploy $DIR_PATH/$i/artifacts/$i.wasm --label "$i $NONCE" --input $INPUT --fees $FEES --chain-id $CHAIN_ID --gas 40000000
 
     # check if the data source exists or not
     yarn oraicli provider get-script $TYPE $i
-    description="test $i"
+    description="$i is a special $TYPE that verify twelve cryptocurrency market prices: BTC, ETH, BNB, XRP, DOGE, USDT, LINK, UNI, USDC, BUSD, ORAI, DAI"
     address=$(cat $PWD/address.txt)
     echo "address: $address"
     echo "description: $description"
@@ -28,10 +28,10 @@ do
     # if the file is not empty, then the data source does not exist. We create new
     if [ -s $PWD/is_exist.txt ]
     then
-        yarn oraicli provider set-$TYPE $i "test $i" $address --fees $FEES --chain-id $CHAIN_ID
+        yarn oraicli provider set-$TYPE $i "test $i" $address --fees $FEES --chain-id $CHAIN_ID --gas 40000000
     else
         # if it exists already, we update the contract
-        yarn oraicli provider edit-$TYPE $i $i "test edit $i" $address --fees $FEES --chain-id $CHAIN_ID
+        yarn oraicli provider edit-$TYPE $i $i "test edit $i" $address --fees $FEES --chain-id $CHAIN_ID --gas 40000000
     fi
     sleep 6
 done

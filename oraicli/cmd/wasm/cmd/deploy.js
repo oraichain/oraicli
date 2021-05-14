@@ -2,6 +2,8 @@ import { Argv } from 'yargs';
 import fs from 'fs';
 import Cosmos from '@oraichain/cosmosjs';
 
+declare var cosmos: Cosmos;
+
 const message = Cosmos.message;
 
 const getStoreMessage = (wasm_byte_code, sender) => {
@@ -20,13 +22,13 @@ const getStoreMessage = (wasm_byte_code, sender) => {
   });
 };
 
-const getInstantiateMessage = (code_id, init_msg, sender, label = '') => {
+const getInstantiateMessage = (code_id, init_msg, sender, label = '', amount = '') => {
+  const sent_funds = amount ? [{ denom: cosmos.bech32MainPrefix, amount }] : null;
   const msgSend = new message.cosmwasm.wasm.v1beta1.MsgInstantiateContract({
     code_id,
     init_msg,
     label,
     sender,
-    init_funds: [{ denom: "orai", amount: String(1000) }]
   });
 
   const msgSendAny = new message.google.protobuf.Any({
@@ -52,18 +54,12 @@ export default async (yargs: Argv) => {
     .option('fees', {
       describe: 'the transaction fees',
       type: 'string'
-    })
-    .option('gas', {
-      describe: 'gas limit',
-      type: 'string',
-      default: '2000000'
-    })
+    }).option('amount', {
+      type: 'string'
+    });
 
   const [file] = argv._.slice(-1);
 
-  const cosmos = new Cosmos(argv.url, argv.chainId);
-
-  cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
   const { gas } = argv;
@@ -71,24 +67,24 @@ export default async (yargs: Argv) => {
   const wasmBody = fs.readFileSync(file).toString('base64');
 
   const txBody1 = getStoreMessage(wasmBody, sender);
-  console.log("argv fees: ", argv)
-  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), parseInt(gas));
+  // console.log('argv fees: ', argv);
+  const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
 
-  console.log("res1: ", res1)
+  // console.log('res1: ', res1);
 
   if (res1.tx_response.code !== 0) {
-    console.log("response: ", res1)
-  };
+    console.log('response: ', res1);
+  }
 
   // next instantiate code
   const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
   const input = Buffer.from(argv.input).toString('base64');
   const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
-  const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), gas);
+  const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
 
   console.log(res2);
-  let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value
-  console.log("contract address: ", address)
+  let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value;
+  console.log('contract address: ', address);
   fs.writeFileSync('./address.txt', address);
 };
 

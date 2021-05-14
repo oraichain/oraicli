@@ -18,7 +18,7 @@
   "author": "Cosmostation",
   "license": "MIT",
   "dependencies": {
-    "@oraichain/cosmosjs": "^0.0.53",
+    "@oraichain/cosmosjs": "0.0.54",
     "bech32": "^1.1.3",
     "dotenv": "^8.2.0",
     "js-sha256": "^0.9.0",

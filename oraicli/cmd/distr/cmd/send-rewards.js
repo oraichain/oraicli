@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 import totalRewards from './get-total-rewards';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 import xlsx from 'xlsx';
 dotenv.config({ silent: process.env.NODE_ENV === 'production' });
 
@@ -39,7 +39,6 @@ export default async (yargs: Argv) => {
 
   const finalReceiveObject = {};
 
-  const cosmos = new Cosmos(argv.url, argv.chainId);
   const message = Cosmos.message;
   cosmos.setBech32MainPrefix('orai');
   const { mnemonics, rewardFile, gasLimit } = argv;
@@ -58,11 +57,11 @@ export default async (yargs: Argv) => {
       let output = {
         address: sheet[nativeAddrCol + j.toString()].v,
         coins: [{ denom: cosmos.bech32MainPrefix, amount: amount.toString() }]
-      }
+      };
       outputs.push(output);
       total += sheet[rewardCol + j.toString()].v;
     }
-    finalReceiveObject[book.SheetNames[i]] = outputs
+    finalReceiveObject[book.SheetNames[i]] = outputs;
   }
 
   // console.log("output length: ", finalReceiveObject[book.SheetNames[0]].length)
@@ -72,16 +71,18 @@ export default async (yargs: Argv) => {
     //console.log("mnemonic: ", mnemonics);
     const childKey = cosmos.getChildKey(mnemonics[i]);
     const sender = cosmos.getAddress(childKey);
-    console.log("sender: ", sender);
+    console.log('sender: ', sender);
     const totalRewards = calculateTotalRewards(book.Sheets[book.SheetNames[i]]);
     console.log("total rewards: ", totalRewards / num)
     // temp reward to test
-    const inputs = [{
-      address: sender,
-      coins: [{ denom: cosmos.bech32MainPrefix, amount: String(totalRewards) }]
-    }]
+    const inputs = [
+      {
+        address: sender,
+        coins: [{ denom: cosmos.bech32MainPrefix, amount: String(totalRewards) }]
+      }
+    ];
 
-    const outputs = finalReceiveObject[book.SheetNames[i]]
+    const outputs = finalReceiveObject[book.SheetNames[i]];
 
     const msgMultiSend = new message.cosmos.bank.v1beta1.MsgMultiSend({
       inputs: inputs,

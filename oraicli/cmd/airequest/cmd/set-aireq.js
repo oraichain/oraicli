@@ -16,7 +16,7 @@ export default async (yargs: Argv) => {
       describe: 'the number of validators',
       type: 'string'
     })
-    .option('fees', {
+    .option('request-fees', {
       describe: 'fees that user is willing to pay',
       type: 'string'
     });
@@ -27,7 +27,7 @@ export default async (yargs: Argv) => {
   const childKey = cosmos.getChildKey(argv.mnemonic);
 
   const [oscriptName, count] = argv._.slice(-2);
-  const { input, expectedOutput, fees } = argv;
+  const { input, expectedOutput, requestFees } = argv;
   // get accAddress in binary
   const accAddress = bech32.fromWords(bech32.toWords(childKey.identifier));
   const msgSend = new message.oraichain.orai.airequest.MsgSetAIRequest({
@@ -35,7 +35,7 @@ export default async (yargs: Argv) => {
     oracle_script_name: oscriptName,
     creator: accAddress,
     validator_count: new Long(count),
-    fees: fees === '' ? '0orai' : fees,
+    fees: requestFees ? '0orai' : requestFees,
     input: Buffer.from(input),
     expected_output: Buffer.from(expectedOutput)
   });
@@ -51,7 +51,7 @@ export default async (yargs: Argv) => {
   });
 
   try {
-    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', 0, 300000);
+    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
     console.log(response);
     console.log('request id: ', req_id);
     const data = await cosmos.get(`/airesult/fullreq/${req_id}`);
@@ -61,4 +61,4 @@ export default async (yargs: Argv) => {
   }
 };
 
-// yarn oraicli airequest set-aireq cv021_os 1 --chain-id $CHAIN_ID --input '{"hash": "QmR27t4rQ8J46T77za9BmguVMapJTWU4ASbBDXSFwFNmGK"}'
+// yarn oraicli airequest set-aireq cv021_os 1 --chain-id $CHAIN_ID --input '{"hash": "QmR27t4rQ8J46T77za9BmguVMapJTWU4ASbBDXSFwFNmGK"}' --fees 50orai

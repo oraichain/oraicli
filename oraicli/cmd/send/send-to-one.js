@@ -3,6 +3,8 @@ import Cosmos from '@oraichain/cosmosjs';
 import dotenv from 'dotenv';
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
 
+declare var cosmos: Cosmos;
+
 export default async (yargs: Argv) => {
     const { argv } = yargs
         .option('address', {
@@ -15,18 +17,17 @@ export default async (yargs: Argv) => {
         });
 
     const message = Cosmos.message;
-    const cosmos = new Cosmos(argv.url, argv.chainId);
     const { address } = argv;
-    console.log("address: ", address)
+    console.log("receiver: ", address)
     cosmos.setBech32MainPrefix('orai');
     const listMnemonics = process.env.LIST_SEND_MNEMONIC.split(",");
     for (let i = 0; i < listMnemonics.length; i++) {
         const mnemonic = listMnemonics[i];
         const childKey = cosmos.getChildKey(mnemonic);
         const address = cosmos.getAddress(mnemonic);
-        console.log("address: ", address)
+        console.log("sender: ", address)
         try {
-            const res = await fetch(`${argv.url}/cosmos/bank/v1beta1/balances/${address}`).then((res) => res.json());
+            const res = await cosmos.get(`/cosmos/bank/v1beta1/balances/${address}`);
             //console.log(res);
             const amount = parseInt(res.balances[0].amount) - 1000;
             console.log("amount: ", amount)
@@ -52,7 +53,7 @@ export default async (yargs: Argv) => {
             } catch (ex) {
                 console.log(ex);
             }
-            //console.log("amount: ", amount)
+            console.log("amount: ", amount)
         } catch (ex) {
             console.log(ex);
         }

@@ -29,6 +29,8 @@ export default async (yargs: Argv) => {
     type: 'string'
   }).option('amount', {
     type: 'string'
+  }).option('msg', {
+    type: 'string'
   });
 
   const [address] = argv._.slice(-1);
@@ -36,8 +38,13 @@ export default async (yargs: Argv) => {
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
   let input = JSON.parse(argv.input);
-  const msgBase64 = Buffer.from(JSON.stringify(input.mint_nft.msg)).toString('base64');
-  input.mint_nft.msg = msgBase64;
+  const outerKey = Object.keys(input)[0];
+  let innerObj = input[outerKey];
+  if ("msg" in innerObj) {
+    const msgBase64 = Buffer.from(JSON.stringify(innerObj.msg)).toString('base64');
+    innerObj.msg = msgBase64;
+    input[outerKey] = innerObj;
+  }
 
   const txBody = getHandleMessage(address, Buffer.from(JSON.stringify(input)), sender, argv.amount);
   const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);

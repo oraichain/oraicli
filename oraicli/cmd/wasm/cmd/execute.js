@@ -5,7 +5,7 @@ declare var cosmos: Cosmos;
 const message = Cosmos.message;
 
 const getHandleMessage = (contract, msg, sender, amount) => {
-  const sent_funds = [{ denom: cosmos.bech32MainPrefix, amount: "10" }];
+  const sent_funds = amount ? [{ denom: cosmos.bech32MainPrefix, amount }] : null;
   const msgSend = new message.cosmwasm.wasm.v1beta1.MsgExecuteContract({
     contract,
     msg,

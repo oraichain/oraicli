@@ -5,7 +5,7 @@ declare var cosmos: Cosmos;
 const message = Cosmos.message;
 
 const getHandleMessage = (contract, msg, sender, amount) => {
-  const sent_funds = amount ? [{ denom: cosmos.bech32MainPrefix, amount }] : null;
+  const sent_funds = [{ denom: cosmos.bech32MainPrefix, amount: "10" }];
   const msgSend = new message.cosmwasm.wasm.v1beta1.MsgExecuteContract({
     contract,
     msg,
@@ -35,10 +35,11 @@ export default async (yargs: Argv) => {
 
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const sender = cosmos.getAddress(childKey);
+  let input = JSON.parse(argv.input);
+  const msgBase64 = Buffer.from(JSON.stringify(input.mint_nft.msg)).toString('base64');
+  input.mint_nft.msg = msgBase64;
 
-  const input = Buffer.from(argv.input);
-
-  const txBody = getHandleMessage(address, input, sender, argv.amount);
+  const txBody = getHandleMessage(address, Buffer.from(JSON.stringify(input)), sender, argv.amount);
   const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
 
   console.log(res);

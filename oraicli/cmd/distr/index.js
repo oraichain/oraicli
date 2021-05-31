@@ -11,5 +11,10 @@ export default async (yargs: Argv) => {
       'send-rewards',
       'Send rewards to all genesis and trusted validators',
       require('./cmd/send-rewards').default
+    )
+    .command(
+      'cal-balances',
+      'Calculate balances for a list of ERC20 addresses',
+      require('./cmd/cal-balances').default
     );
 };

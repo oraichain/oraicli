@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import xlsx from 'xlsx';
 dotenv.config({ silent: process.env.NODE_ENV === 'production' });
 
+declare var cosmos: Cosmos;
+
 const num = 1000000;
 const nativeAddrCol = 'A';
 const rewardCol = 'D';

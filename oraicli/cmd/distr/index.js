@@ -16,5 +16,10 @@ export default async (yargs: Argv) => {
       'cal-balances',
       'Calculate balances for a list of ERC20 addresses',
       require('./cmd/cal-balances').default
+    )
+    .command(
+      'unique',
+      'Get unique mapping addresses',
+      require('./cmd/unique-mapping').default
     );
 };

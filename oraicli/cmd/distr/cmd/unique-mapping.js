@@ -146,7 +146,7 @@ export default async (yargs: Argv) => {
         for (let i = 0; i < mapping.length; i++) {
             let map = mapping[i];
             let mapArr = map.split(',');
-            console.log(mapArr[1]);
+            // console.log(mapArr[1]);
             // console.log(mapArr[1]);
             erc20.push(mapArr[0]);
             native.push(mapArr[1]);
@@ -154,7 +154,7 @@ export default async (yargs: Argv) => {
         // console.log("erc20: ", erc20);
         // console.log("native: ", native);
         // console.log("mapping list: ", mappedAddrs);
-        // console.log("intersection: ", intersection);
+        console.log("intersection: ", intersection);
     });
 
 };

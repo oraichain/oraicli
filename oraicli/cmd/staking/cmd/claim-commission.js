@@ -18,7 +18,7 @@ export default async (yargs: Argv) => {
     console.log("private key: ", privateKey);
     const msg = {
         nft_addr: "orai1um7dwaz4uexd2zjl0yzeaqw20ltq7y5qpcq35n",
-        token_id: "1009",
+        token_id: "1013",
         orai_addr: "orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573",
         nonce: 1
     }

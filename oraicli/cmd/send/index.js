@@ -13,6 +13,10 @@ export default async (yargs: Argv) => {
     .option('amount', {
       default: '1',
       type: 'string'
+    })
+    .option('memo', {
+      default: '',
+      type: 'string'
     });
 
   const [to_address] = argv._.slice(-1);
@@ -35,7 +39,7 @@ export default async (yargs: Argv) => {
 
   const txBody = new message.cosmos.tx.v1beta1.TxBody({
     messages: [msgSendAny],
-    memo: ''
+    memo: argv.memo
   });
 
   try {

@@ -1,9 +1,7 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 import totalRewards from './get-total-rewards';
-import dotenv from 'dotenv';
 import xlsx from 'xlsx';
-dotenv.config({ silent: process.env.NODE_ENV === 'production' });
 
 declare var cosmos: Cosmos;
 

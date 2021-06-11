@@ -23,6 +23,11 @@ const argv = yargs(hideBin(process.argv))
   .command('provider', 'update provider data', require('./cmd/provider').default)
   .command('airequest', 'airequest commands', require('./cmd/airequest').default)
   .command('distr', 'distribution commands', require('./cmd/distr').default)
+  .command('ibc', 'ibc commands', require('./cmd/ibc').default)
+  .option('memo', {
+    default: '',
+    type: 'string'
+  })
   .option('gas', {
     type: 'number',
     default: 2000000

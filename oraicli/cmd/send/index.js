@@ -13,12 +13,7 @@ export default async (yargs: Argv) => {
     .option('amount', {
       default: '1',
       type: 'string'
-    })
-    .option('memo', {
-      default: '',
-      type: 'string'
     });
-
   const [to_address] = argv._.slice(-1);
 
   const message = Cosmos.message;

@@ -1,6 +1,8 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 
+declare var cosmos: Cosmos;
+
 export default async (yargs: Argv) => {
   const { argv } = yargs
     .positional('address', {
@@ -12,18 +14,17 @@ export default async (yargs: Argv) => {
       default: '1',
       type: 'string'
     });
+  const [to_address] = argv._.slice(-1);
 
   const message = Cosmos.message;
-  const cosmos = new Cosmos(argv.url, argv.chainId);
-  cosmos.setBech32MainPrefix('orai');
   const childKey = cosmos.getChildKey(argv.mnemonic);
-  const address = cosmos.getAddress(argv.mnemonic);
-  console.log("address: ", address)
+  const address = cosmos.getAddress(childKey);
+  console.log('from: ', address);
 
   const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
     from_address: cosmos.getAddress(childKey),
-    to_address: argv.address,
-    amount: [{ denom: cosmos.bech32MainPrefix, amount: String(argv.amount) }] // 10
+    to_address,
+    amount: [{ denom: cosmos.bech32MainPrefix, amount: argv.amount }] // 10
   });
 
   const msgSendAny = new message.google.protobuf.Any({
@@ -33,7 +34,7 @@ export default async (yargs: Argv) => {
 
   const txBody = new message.cosmos.tx.v1beta1.TxBody({
     messages: [msgSendAny],
-    memo: ''
+    memo: argv.memo
   });
 
   try {

@@ -3,16 +3,15 @@ import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
 import Cosmos from '@oraichain/cosmosjs';
 
-const config = { silent: process.env.NODE_ENV === 'development' };
-if (process.env.NODE_ENV !== 'production') {
-  config.path = `.env.${process.env.NODE_ENV}`;
-}
-dotenv.config(config);
-// global
-global.cosmos = new Cosmos(process.env.URL, process.env.CHAIN_ID || 'Oraichain');
-cosmos.setBech32MainPrefix('orai');
-
 const argv = yargs(hideBin(process.argv))
+  .config('env', (path) => {
+    dotenv.config({ path });
+    // global
+    global.cosmos = new Cosmos(process.env.URL, process.env.CHAIN_ID || 'Oraichain');
+    cosmos.setBech32MainPrefix('orai');
+    return { mnemonic: process.env.SEND_MNEMONIC };
+  })
+  .default('env', '.env')
   .alias('help', 'h')
   .alias('version', 'v')
   .command('send [address]', 'send orai token', require('./cmd/send/index').default)
@@ -33,8 +32,4 @@ const argv = yargs(hideBin(process.argv))
   .option('gas', {
     type: 'number',
     default: 2000000
-  })
-  .option('mnemonic', {
-    type: 'string',
-    default: process.env.SEND_MNEMONIC
   }).argv;

@@ -23,7 +23,7 @@ let msgHash = Buffer.from(crypto.createHash('sha256').update(JSON.stringify(msg)
 console.log("msg hash: ", msgHash.toString('hex'));
 (async () => {
     const publicKey = await ed.getPublicKey(privateKey);
-    // console.log("public key; ", Buffer.from(publicKey).toString('base64'));
+    console.log("public key; ", Buffer.from(publicKey).toString('base64'));
     const signature = await ed.sign(msgHash, privateKey);
     // console.log("signature: ", Buffer.from(signature).toString('base64'));
     const isSigned = await ed.verify(signature, msgHash, publicKey);

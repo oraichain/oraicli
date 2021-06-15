@@ -45,9 +45,9 @@ echo $TC_RAW
 
 if [ -s $PWD/is_exist.txt ]
 then
-    yarn oraicli provider set-oscript $OS "test $OS" $address --ds ${DS[*]} --tc ${TC[*]} --fees $FEES --chain-id $CHAIN_ID --gas 40000000
+    yarn oraicli provider set-oscript $OS "production $OS" $address --ds ${DS[*]} --tc ${TC[*]} --fees $FEES --chain-id $CHAIN_ID --gas 40000000
 else
-    yarn oraicli provider edit-oscript $OS $OS "test $OS" $address --ds ${DS[*]} --tc ${TC[*]} --fees $FEES --chain-id $CHAIN_ID --gas 40000000
+    yarn oraicli provider edit-oscript $OS $OS "production $OS" $address --ds ${DS[*]} --tc ${TC[*]} --fees $FEES --chain-id $CHAIN_ID --gas 40000000
 fi
 
-# ./deploy_oscript.sh classification,cv009 classification_testcase classification_oscript '' 17 ../oraiwasm/smart-contracts/package/cv 5000orai
+# ./deploy_oscript.sh classification,cv009 classification_testcase classification_oscript '' 17 ../oraiwasm/package/cv 5000orai

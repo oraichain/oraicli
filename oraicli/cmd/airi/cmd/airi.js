@@ -87,63 +87,61 @@ export default async (yargs: Argv) => {
   accs = [...new Set(accs)].filter(acc => !delegatorAccs.some(delegatorAcc => delegatorAcc === acc.address));
   console.log(accs.length, valAccs.length, filteredDelegatorAccs.length);
 
-  // calculate balances depending on the type of accounts
-  valAccs = calculateBalance(valAccs, "validator");
-  filteredDelegatorAccs = calculateBalance(filteredDelegatorAccs, "delegator");
-  accs = calculateBalance(accs, "regular");
-  console.log("validator accs: ", valAccs);
-
   // collect transactions with memo to again filter the list
-
   let mappingList = await getMappingAddress();
   console.log("mapping list: ", mappingList.length);
-  // final filter to add bsc address into the list of accs
-  valAccs = addBscAddr(valAccs, mappingList);
+  // final filter to add bsc address into the list of accs with new balances
+  valAccs = addBscAddr(valAccs, mappingList, "validator");
+  filteredDelegatorAccs = addBscAddr(filteredDelegatorAccs, mappingList, "delegator");
+  accs = addBscAddr(accs, mappingList, "regular");
+  console.log("valAccs: ", valAccs);
+  console.log(accs.length, valAccs.length, filteredDelegatorAccs.length);
+  if (mappingList.length !== (accs.length + valAccs.length + filteredDelegatorAccs.length)) {
+    console.error("LISTS DO NOT EQUAL IN LENGTH, SOMETHING IS WRONG!");
+  }
 };
 
 const getAccounts = async () => {
   let page = 1;
   let all = [];
-  while (true) {
-    let responses = await fetch(`${scanUrl}/accounts?page_id=${page}`).then(data => data.json());
-    if (page > responses.page.total_page) break;
-    if (responses.data) {
-      for (let data of responses.data) {
-        let balance = data.balance / 10 ** 6;
-        all.push({ address: data.address, balance, multipliedBalance: balance });
+  let responses = {};
+  do {
+    try {
+      responses = await fetch(`${scanUrl}/accounts?page_id=${page}`).then(data => data.json());
+      if (responses.data) {
+        for (let data of responses.data) {
+          let balance = data.balance / 10 ** 6;
+          all.push({ address: data.address, balance, multipliedBalance: balance });
+        }
       }
+      console.log("page: ", page);
+      page += 1;
+    } catch (error) {
+      console.log(error);
+      continue;
     }
-    console.log("page: ", page);
-    page += 1;
-  }
+  } while (page <= responses.page.total_page)
   return all;
-}
-
-const calculateBalance = (list, type) => {
-  switch (type) {
-    case "validator":
-      list = list.map(element => ({ ...element, multipliedBalance: element.multipliedBalance * 8 }));
-      break;
-    case "delegator":
-      list = list.map(element => ({ ...element, multipliedBalance: element.multipliedBalance * 4 }));
-      break;
-    default:
-      break;
-  }
-  return list;
 }
 
 const getMappingAddress = async () => {
   let offset = 0;
   let list = [];
-  while (true) {
-    let responses = await cosmos.get(`/cosmos/tx/v1beta1/txs?events=transfer.recipient%3D%27orai1hz08wrlkrl37gwhqpxpkynmw8juad72pxp0e94%27&order_by=2&pagination.offset=${offset}`);
-    if (responses.code) break;
-    let { total } = responses.pagination;
-    list = list.concat(parseMemo(responses.tx_responses));
-    offset += 100;
-  }
-  return list;
+  let responses = {};
+  do {
+    try {
+      responses = await cosmos.get(`/cosmos/tx/v1beta1/txs?events=transfer.recipient%3D%27orai1hz08wrlkrl37gwhqpxpkynmw8juad72pxp0e94%27&order_by=2&pagination.offset=${offset}`);
+      if (responses.code) break;
+      let { total } = responses.pagination;
+      list = list.concat(parseMemo(responses.tx_responses));
+      offset += 100;
+    } catch (error) {
+      console.log(error);
+      continue;
+    }
+  } while (responses.code === undefined)
+  // remove duplicate objects to verify if the snapshot did correctly
+  return list.filter((v, i, a) => a.findIndex(t => (t.address === v.address)) === i);
 }
 
 const parseMemo = (txResponses) => {
@@ -155,17 +153,24 @@ const parseMemo = (txResponses) => {
     let bscAddr = memo.split(' ')[0];
     // if length is not correct => ignore
     if (bscAddr.length !== 42) continue;
+
     list.push({ bscAddr, address });
   }
   return list;
 }
 
-const addBscAddr = (accs, bscList) => {
-  accs = accs.filter(acc => bscList.some(element => element.address === acc.address))
-    .map(acc =>
-      ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr }));
-  console.log("address after adding bsc and filtering: ", accs.length);
-  console.log("length of accs: ", accs);
-  return accs;
+const addBscAddr = (accs, bscList, type) => {
+  accs = accs.filter(acc => bscList.some(element => element.address === acc.address));
+  console.log("acc length after filter: ", accs.length);
+  switch (type) {
+    case "validator":
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 8 }));
+    case "delegator":
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 4 }));
+      break;
+    default:
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance }));
+      break;
+  }
 }
 

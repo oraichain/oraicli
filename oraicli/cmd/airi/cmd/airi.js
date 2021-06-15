@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 import bech32 from 'bech32';
-import axios from 'axios';
+import assert from 'assert';
 declare var cosmos: Cosmos;
 const scanUrl = process.env.SCAN_URL || "https://api.scan.orai.io/v1";
 const lcd = process.env.URL || "https://lcd.orai.io";
@@ -47,7 +47,6 @@ export default async (yargs: Argv) => {
   let accs = [];
   let valAccs = [];
   let delegatorAccs = [];
-  console.log("cosmos endpoint: ", cosmos.url);
   const res = await cosmos.get("/cosmos/staking/v1beta1/validators");
   // console.log("res: ", res);
   const validatorList = res.validators;
@@ -66,15 +65,18 @@ export default async (yargs: Argv) => {
     // console.log("res: ", res.delegation_responses.map(data => data.delegation.delegator_address));
     delegatorAccs = delegatorAccs.concat(res.delegation_responses.map(data => data.delegation.delegator_address));
   }
-  accs = await getAccounts();
+  // make sure the list is unique
+  accs = [...new Set(await getAccounts())];
 
   // filter delegators so that it is unique and validators cannot be in this array
-  console.log(delegatorAccs.length);
+  console.log(accs.length);
   // delegators also include validators because validators also delegate to their nodes, so we keep this array to quickly filter the accs array
   delegatorAccs = [...new Set(delegatorAccs)];
   // filter all validators
   let filteredDelegatorAccs = delegatorAccs.filter(val => !valAccs.includes(val));
 
+  // all validators should be delegators as well, if not => error
+  assert(filteredDelegatorAccs.length + valAccs.length === delegatorAccs.length);
   // console.log("val accs: ", valAccs);
   // set balances to validators. Because accs have no duplicate address => when filter, get the first item of the new array
   valAccs = valAccs.map(valAcc => accs.filter(acc => acc.address === valAcc)[0])
@@ -84,7 +86,11 @@ export default async (yargs: Argv) => {
   filteredDelegatorAccs = filteredDelegatorAccs.map(delegatorAcc => accs.filter(acc => acc.address === delegatorAcc)[0]);
 
   // filter accounts to remove all delegators & validators
-  accs = [...new Set(accs)].filter(acc => !delegatorAccs.some(delegatorAcc => delegatorAcc === acc.address));
+  let accsLen = accs.length;
+  accs = accs.filter(acc => !delegatorAccs.some(delegatorAcc => delegatorAcc === acc.address));
+
+  // all regular holders should not be in the list of validators & delegators
+  assert(accs.length + delegatorAccs.length === accsLen);
   console.log(accs.length, valAccs.length, filteredDelegatorAccs.length);
 
   // collect transactions with memo to again filter the list
@@ -94,11 +100,7 @@ export default async (yargs: Argv) => {
   valAccs = addBscAddr(valAccs, mappingList, "validator");
   filteredDelegatorAccs = addBscAddr(filteredDelegatorAccs, mappingList, "delegator");
   accs = addBscAddr(accs, mappingList, "regular");
-  console.log("valAccs: ", valAccs);
   console.log(accs.length, valAccs.length, filteredDelegatorAccs.length);
-  if (mappingList.length !== (accs.length + valAccs.length + filteredDelegatorAccs.length)) {
-    console.error("LISTS DO NOT EQUAL IN LENGTH, SOMETHING IS WRONG!");
-  }
 };
 
 const getAccounts = async () => {
@@ -141,35 +143,39 @@ const getMappingAddress = async () => {
     }
   } while (responses.code === undefined)
   // remove duplicate objects to verify if the snapshot did correctly
-  return list.filter((v, i, a) => a.findIndex(t => (t.address === v.address)) === i);
+  return list;
 }
 
 const parseMemo = (txResponses) => {
   let list = [];
   for (let data of txResponses) {
-    let { memo } = data.tx.body;
-    let address = data.tx.body.messages[0].from_address;
-    // always get the first element, if cannot get => wrong format, and we ignore it
-    let bscAddr = memo.split(' ')[0];
-    // if length is not correct => ignore
-    if (bscAddr.length !== 42) continue;
+    try {
+      let { memo } = data.tx.body;
+      let address = data.tx.body.messages[0].from_address;
+      // always get the first element, if cannot get => wrong format, and we ignore it
+      let bscAddr = memo.split(' ')[0];
+      // if length is not correct => ignore
+      if (bscAddr.length !== 42) continue;
 
-    list.push({ bscAddr, address });
+      list.push({ bscAddr, address });
+    } catch (error) {
+      console.log("error parsing memo: ", error);
+      continue;
+    }
   }
   return list;
 }
 
 const addBscAddr = (accs, bscList, type) => {
   accs = accs.filter(acc => bscList.some(element => element.address === acc.address));
-  console.log("acc length after filter: ", accs.length);
   switch (type) {
     case "validator":
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 8 }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance * 8 }));
     case "delegator":
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 4 }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance * 4 }));
       break;
     default:
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance }));
       break;
   }
 }

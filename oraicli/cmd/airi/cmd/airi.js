@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 import bech32 from 'bech32';
 import assert from 'assert';
+import fs from 'fs';
 declare var cosmos: Cosmos;
 const scanUrl = process.env.SCAN_URL || "https://api.scan.orai.io/v1";
 const lcd = process.env.URL || "https://lcd.orai.io";
@@ -101,6 +102,18 @@ export default async (yargs: Argv) => {
   filteredDelegatorAccs = addBscAddr(filteredDelegatorAccs, mappingList, "delegator");
   accs = addBscAddr(accs, mappingList, "regular");
   console.log(accs.length, valAccs.length, filteredDelegatorAccs.length);
+
+  // write to files to take snapshot
+  // write to files to take snapshot
+  if (!fs.existsSync('./airi-snapshot')) fs.mkdirSync('./airi-snapshot');
+  fs.writeFileSync('./airi-snapshot/validators.json', JSON.stringify(valAccs));
+  fs.writeFileSync('./airi-snapshot/delegators.json', JSON.stringify(filteredDelegatorAccs));
+  fs.writeFileSync('./airi-snapshot/regular.json', JSON.stringify(accs));
+
+  let mergeAccs = accs.concat(valAccs).concat(filteredDelegatorAccs);
+  console.log("merge accs length: ", mergeAccs.length);
+  assert(mergeAccs.length, accs.length + valAccs.length + filteredDelegatorAccs.length);
+  fs.writeFileSync('./airi-snapshot/all-accs.json', JSON.stringify(mergeAccs));
 };
 
 const getAccounts = async () => {
@@ -112,6 +125,8 @@ const getAccounts = async () => {
       responses = await fetch(`${scanUrl}/accounts?page_id=${page}`).then(data => data.json());
       if (responses.data) {
         for (let data of responses.data) {
+          // auto ignore 
+          if (data.balance === 0) continue;
           let balance = data.balance / 10 ** 6;
           all.push({ address: data.address, balance, multipliedBalance: balance });
         }
@@ -179,4 +194,3 @@ const addBscAddr = (accs, bscList, type) => {
       break;
   }
 }
-

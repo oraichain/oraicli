@@ -107,3 +107,7 @@ dist
 *.txt
 
 *.xlsx
+
+*.zip
+
+airi-snapshot/

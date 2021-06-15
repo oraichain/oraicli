@@ -2,6 +2,7 @@ import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
 import bech32 from 'bech32';
 import assert from 'assert';
+import sha3 from 'crypto-js/sha3';
 import fs from 'fs';
 declare var cosmos: Cosmos;
 const scanUrl = process.env.SCAN_URL || "https://api.scan.orai.io/v1";

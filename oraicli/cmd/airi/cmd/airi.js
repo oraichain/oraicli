@@ -186,12 +186,12 @@ const addBscAddr = (accs, bscList, type) => {
   accs = accs.filter(acc => bscList.some(element => element.address === acc.address));
   switch (type) {
     case "validator":
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance * 8 }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 8 }));
     case "delegator":
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance * 4 }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance * 4 }));
       break;
     default:
-      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address).slice(-1)[0].bscAddr, multipliedBalance: acc.balance }));
+      return accs.map(acc => ({ ...acc, bscAddr: bscList.filter(bsc => bsc.address === acc.address)[0].bscAddr, multipliedBalance: acc.balance }));
       break;
   }
 }

@@ -3,7 +3,9 @@ import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
 import Cosmos from '@oraichain/cosmosjs';
 
-dotenv.config({ silent: process.env.NODE_ENV === 'development' });
+const config = {};
+config.path = `.env.${process.env.NODE_ENV}`;
+require('dotenv').config(config);
 // global
 global.cosmos = new Cosmos(process.env.URL, process.env.CHAIN_ID || 'Oraichain');
 cosmos.setBech32MainPrefix('orai');

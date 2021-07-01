@@ -5,12 +5,6 @@ const crypto = require('crypto'); // https://nodejs.org/api/crypto.html
 
 const privRandom = ed.utils.randomPrivateKey()
 console.log("priv random: ", privRandom);
-
-const privateKey = new Uint8Array([91, 76, 13, 131, 127, 103, 132, 13,
-    134, 176, 248, 242, 127, 217, 39, 60,
-    93, 36, 142, 98, 228, 197, 120, 35,
-    181, 87, 125, 184, 37, 4, 38, 19]);
-console.log("private key: ", privateKey);
 const msg = {
     nft_addr: "orai1um7dwaz4uexd2zjl0yzeaqw20ltq7y5qpcq35n",
     token_id: "1009",

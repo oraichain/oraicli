@@ -81,6 +81,7 @@ export default async (yargs: Argv) => {
     if (res1.tx_response.code !== 0) {
       console.log('response: ', res1);
     }
+    console.log('res1: ', res1);
 
     // next instantiate code
     const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;

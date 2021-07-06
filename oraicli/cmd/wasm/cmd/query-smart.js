@@ -11,6 +11,7 @@ export default async (yargs: Argv) => {
   });
 
   const [address] = argv._.slice(-1);
+  console.log(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(argv.input).toString('base64')}`);
   const data = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(argv.input).toString('base64')}`);
   console.log(data.data);
 };

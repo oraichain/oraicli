@@ -5,11 +5,11 @@ import Cosmos from '@oraichain/cosmosjs';
 
 const argv = yargs(hideBin(process.argv))
   .config('env', (path) => {
-    dotenv.config({ path });
+    const config = dotenv.config({ path }).parsed;
     // global
-    global.cosmos = new Cosmos(process.env.URL || "https://lcd.orai.io", process.env.CHAIN_ID || 'Oraichain');
+    global.cosmos = new Cosmos(config.URL || 'https://lcd.orai.io', config.CHAIN_ID || 'Oraichain');
     cosmos.setBech32MainPrefix('orai');
-    return { mnemonic: process.env.SEND_MNEMONIC };
+    return { mnemonic: config.SEND_MNEMONIC };
   })
   .default('env', '.env')
   .alias('help', 'h')

@@ -52,6 +52,8 @@ export default async (yargs: Argv) => {
         const { address } = argv;
         const childKey = cosmos.getChildKey(argv.mnemonic);
         const sender = cosmos.getAddress(childKey);
+        const publicKey = getPublicKey(privateKey);
+        console.log('publicKey', Buffer.from(publicKey).toString('base64'));
         console.log("sender: ", sender);
         // collect current round & previous signature
         let input = {
@@ -66,11 +68,9 @@ export default async (yargs: Argv) => {
         let { round, signature } = result.data;
         // +1 for new round, and current signature is previous signature in the next round
         const message = roundToMessage(round + 1, signature);
-        const publicKey = getPublicKey(privateKey);
         signature = await sign(message, privateKey);
         signature = Buffer.from(signature, 'hex').toString('base64');
         // console.log('Round', round.toString());
-        // console.log('publicKey', Buffer.from(publicKey).toString('base64'));
         console.log("new signature: ", signature);
 
         // update new randomness

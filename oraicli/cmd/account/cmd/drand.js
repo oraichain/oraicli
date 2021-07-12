@@ -79,9 +79,9 @@ export default async (yargs: Argv) => {
     const message = roundToMessage(round, previous_signature);
     const publicKey = getPublicKey(privateKey);
     const signature = await sign(message, privateKey);
-    console.log('Round', round.toString());
-    console.log('publicKey', Buffer.from(publicKey).toString('base64'));
-    console.log('signature', Buffer.from(signature, 'hex').toString('base64'));
+    // console.log('Round', round.toString());
+    // console.log('publicKey', Buffer.from(publicKey).toString('base64'));
+    console.log(Buffer.from(signature, 'hex').toString('base64'));
   } catch (ex) {
     console.log(ex);
   }

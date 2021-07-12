@@ -5,5 +5,6 @@ export default async (yargs: Argv) => {
     .command('create', 'create account', require('./cmd/create').default)
     .command('privatekey', 'get private key', require('./cmd/privatekey').default)
     .command('balance', 'get account balance', require('./cmd/balance').default)
-    .command('drand', 'create decentralized randomness', require('./cmd/drand').default);
+    .command('drand', 'create decentralized randomness', require('./cmd/drand').default)
+    .command('drand-full', 'full flow creating a decentralized random seed', require('./cmd/drand-full').default);
 };

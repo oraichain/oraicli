@@ -25,6 +25,7 @@ const argv = yargs(hideBin(process.argv))
   .command('distr', 'distribution commands', require('./cmd/distr').default)
   .command('ibc', 'ibc commands', require('./cmd/ibc').default)
   .command('airi', 'airi commands', require('./cmd/airi').default)
+  .command('proposals', 'prososal commands', require('./cmd/proposal').default)
   .option('memo', {
     default: '',
     type: 'string'

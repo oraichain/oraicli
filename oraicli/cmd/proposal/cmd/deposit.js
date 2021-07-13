@@ -44,4 +44,4 @@ export default async (yargs: Argv) => {
     }
 }
 
-// example: yarn oraicli proposals create-proposal
+// example: yarn oraicli proposals deposit --proposal_id 10 --amount 10000000

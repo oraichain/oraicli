@@ -57,4 +57,4 @@ export default async (yargs: Argv) => {
     }
 }
 
-// example: yarn oraicli proposals create-proposal
+// example: yarn oraicli proposals vote --proposal_id 10 --option 1

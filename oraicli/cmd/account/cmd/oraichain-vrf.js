@@ -7,7 +7,6 @@ const roundToMessage = (round, previous_signature) => {
     const view = new DataView(new ArrayBuffer(8));
     const roundNum = BigInt(round);
     view.setBigUint64(0, roundNum);
-    let buffer = Buffer.from(view.buffer);
     const hash = crypto.createHash('sha256');
     if (previous_signature) {
         hash.update(Buffer.from(previous_signature, 'base64'));

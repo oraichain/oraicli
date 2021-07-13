@@ -65,9 +65,12 @@ export default async (yargs: Argv) => {
     memo: ''
   });
 
-  const response = await cosmos.submit(childKey, txBody);
-
-  console.log(response);
+  try {
+    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
+    console.log(response);
+  } catch (ex) {
+    console.log(ex);
+  }
 };
 
 // yarn oraicli multisend 40 --receivers orai14ruagqc8ta5v452207t6n9cyautyjnzl39hrjh orai1nayufsvk9fdwfz5k9ytacl62uf28s4puaz67h8 orai1t5g84uyusz9d8jrpfql99ptg8l75ck3l8rrvd4 --receiver-amounts 10 10 20

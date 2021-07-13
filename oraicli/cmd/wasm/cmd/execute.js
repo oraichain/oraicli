@@ -24,12 +24,14 @@ const getHandleMessage = (contract, msg, sender, amount) => {
 };
 
 export default async (yargs: Argv) => {
-  const { argv } = yargs.positional('address', {
-    describe: 'the smart contract address',
-    type: 'string'
-  }).option('amount', {
-    type: 'string'
-  });
+  const { argv } = yargs
+    .positional('address', {
+      describe: 'the smart contract address',
+      type: 'string'
+    })
+    .option('amount', {
+      type: 'string'
+    });
 
   const [address] = argv._.slice(-1);
 
@@ -39,7 +41,10 @@ export default async (yargs: Argv) => {
   const input = Buffer.from(argv.input);
 
   const txBody = getHandleMessage(address, input, sender, argv.amount);
-  const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
-
-  console.log(res);
+  try {
+    const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
+    console.log(res);
+  } catch (error) {
+    console.log('error: ', error);
+  }
 };

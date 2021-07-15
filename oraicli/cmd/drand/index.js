@@ -34,6 +34,11 @@ export default async (yargs: Argv) => {
             type: 'number',
             default: 1
         })
+        .option('user_input', {
+            describe: 'unique user input',
+            type: 'string',
+            default: ''
+        })
         .option('amount', {
             describe: 'fees to update the vrf round',
             type: 'string',
@@ -47,7 +52,9 @@ export default async (yargs: Argv) => {
 
     // invoke handle message contract to update the randomness value. Min fees is 1orai
     const input = Buffer.from(JSON.stringify({
-        invoke_add: {}
+        invoke_add: {
+            user_input: argv.user_input
+        }
     }));
 
     const txBody = getHandleMessage(address, input, sender, argv.amount);

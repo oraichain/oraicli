@@ -100,7 +100,11 @@ const oldMapping = [
     "0xa34A4Aac320a184aB85D927923f4587Df6015dEC,orai19cxtwhlnfpk7vtrcn0fdj5rcka3ww09r64qyga",
     "0x5E79289C230b3A85D66d4bF47e100d3C5097F3dA,orai18a62pymppe67ya8ex6gvneqnuupr28fg64wmnn",
     "0x8F3354262f268C5897e447Bc2A53074080b8cb8d,orai13pjjdm2agu70zndzszhf5v7jweackj08fjkr03",
-    "0x69Db3A04391eA1EAAcAa340Fcf4364791AAbC443,orai1eh55a89alp8srhs5pz4csddqaujlj58ywtja33"];
+    "0x69Db3A04391eA1EAAcAa340Fcf4364791AAbC443,orai1eh55a89alp8srhs5pz4csddqaujlj58ywtja33",
+    "0x0D205efD9f21B59B3608013252EDEF572F9f234C,orai1tf8g5rjadccqnjp3aktqh4qp82l4wmk8wll3k9",
+    "0xcA5660e225c9CD120283dCA37c4401009f8D5E69,orai1lwsq3768lunk78wdsj836svlfpfs09m3jfzc93",
+    "0x2E072495e0ab59bc0aD1060AE8dEec76bbc401a2,orai1skzlm9q40neuwqyus2d5c2slc4feye5wgk8hve",
+    "0xCa83A74291e78B534b9EF1D0047a663942645741,orai1axsvaad5n76aqszdsxqd0yt0w6r9uvh226dmta"];
 
 declare var cosmos: Cosmos;
 
@@ -126,8 +130,9 @@ export default async (yargs: Argv) => {
     lineReader.on('line', (line) => {
         newMapping.push(line);
     }).on('close', async () => {
-        console.log("mapped address: ", [...new Set(newMapping)].length);
-        let intersection = [...new Set(newMapping)].filter(x => !oldMapping.includes(x));
+        let uniqueNewMapping = [...new Set(newMapping)];
+        console.log("mapped address: ", uniqueNewMapping.length);
+        let intersection = uniqueNewMapping.filter(x => !oldMapping.includes(x));
         // console.log("mapped: ", mappedAddrs[0]);
         // console.log("mapping: ", mapping[0]);
         // console.log("equal?: ", mappedAddrs[0] === mapping[0])

@@ -44,11 +44,16 @@ export default async (yargs: Argv) => {
             describe: 'drand address',
             type: 'string',
             default: ''
-        });
+        })
+        .option('amount', {
+            describe: 'funds to the random contract',
+            type: 'string',
+            default: ''
+        })
 
     try {
         const { privateKey } = await cosmos.getChildKey(argv.mnemonic);
-        const { address } = argv;
+        const { address, amount } = argv;
         const childKey = cosmos.getChildKey(argv.mnemonic);
         const sender = cosmos.getAddress(childKey);
         const publicKey = getPublicKey(privateKey);
@@ -79,7 +84,7 @@ export default async (yargs: Argv) => {
             }
         }));
 
-        const txBody = getHandleMessage(address, input, sender);
+        const txBody = getHandleMessage(address, input, sender, amount);
         const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
         console.log(res);
         // if the transaction is successful, we query again to get new random seed

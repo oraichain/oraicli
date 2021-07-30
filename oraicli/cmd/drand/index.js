@@ -52,8 +52,8 @@ export default async (yargs: Argv) => {
 
     // invoke handle message contract to update the randomness value. Min fees is 1orai
     const input = Buffer.from(JSON.stringify({
-        invoke_add: {
-            user_input: argv.user_input
+        request_random: {
+            input: Buffer.from("hello world").toString('base64')
         }
     }));
 
@@ -67,29 +67,22 @@ export default async (yargs: Argv) => {
 
     // query latest random round
     const queryLatestInput = JSON.stringify({
-        latest: {}
+        latest_round: {}
     })
     const latest = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(queryLatestInput).toString('base64')}`);
     console.log("latest round: ", latest);
 
     // query current fees required
-    const queryFeesInput = JSON.stringify({
-        get_fees: {}
+    const queryConfig = JSON.stringify({
+        contract_info: {}
     })
-    const fees = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(queryFeesInput).toString('base64')}`);
-    console.log("current fees: ", fees);
-
-    // query pub key
-    const queryPubkeyInput = JSON.stringify({
-        pub_key: {}
-    })
-    const pubkey = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(queryPubkeyInput).toString('base64')}`);
-    console.log("pubkey: ", pubkey);
+    const fees = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(queryConfig).toString('base64')}`);
+    console.log("current contract info: ", fees);
 
     // query a specific round information
     let round = argv.round ? argv.round : 1;
     const queryRoundInput = JSON.stringify({
-        get: { round }
+        get_round: { round }
     })
     const roundOutput = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(queryRoundInput).toString('base64')}`);
     console.log(`round ${round} information: `, roundOutput);

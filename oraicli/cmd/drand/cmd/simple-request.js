@@ -61,9 +61,9 @@ export default async (yargs: Argv) => {
         const round = JSON.parse(res.tx_response.raw_log)[0].events[2].attributes[3].value;
         console.log("round: ", JSON.parse(res.tx_response.raw_log)[0].events[2].attributes[3].value);
 
-        const attributes = await checkAggregateSig(round);
+        const attributes = await checkAggregateSig(round, address);
         const aggregateSig = JSON.parse(Buffer.from(attributes[3].value, 'base64').toString());
-        console.log("aggregate sig information": aggregateSig);
+        console.log("aggregate sig information: ", aggregateSig);
 
         const signedSig = Uint8Array.from(Buffer.from(aggregateSig.signed_sig, 'base64'));
         const message = Uint8Array.from(Buffer.from(aggregateSig.sig, 'base64'));
@@ -77,16 +77,17 @@ export default async (yargs: Argv) => {
     }
 };
 
-const checkAggregateSig = async (round) => {
+const checkAggregateSig = async (round, address) => {
+    console.log(`/cosmos/tx/v1beta1/txs?events=wasm.function_type%3D%27aggregate_sig%27&events=wasm.round%3D%27${round}%27&events=wasm.contract_address%3D%27${address}%27`)
     try {
-        const expectedResult = await cosmos.get(`/cosmos/tx/v1beta1/txs?events=wasm.function_type%3D%27aggregate_sig%27&events=wasm.round%3D%27${round}%27`);
+        const expectedResult = await cosmos.get(`/cosmos/tx/v1beta1/txs?events=wasm.function_type%3D%27aggregate_sig%27&events=wasm.round%3D%27${round}%27&events=wasm.contract_address%3D%27${address}%27`);
         console.log("response: ", expectedResult.tx_responses[0]);
         const attributes = JSON.parse(expectedResult.tx_responses[0].raw_log)[0].events[1].attributes;
         return attributes;
     } catch (error) {
         console.log("error: ", error);
         await sleep(5000);
-        return await checkAggregateSig(round);
+        return await checkAggregateSig(round, address);
     }
 }
 

@@ -11,7 +11,10 @@ export default async (yargs: Argv) => {
     for (let mnemonic of listMnemonics) {
         const childKey = cosmos.getChildKey(mnemonic);
         const delegator = cosmos.getAddress(mnemonic);
+        console.log('delegator: ', delegator);
         const delegations = (await cosmos.get(`/cosmos/staking/v1beta1/delegations/${delegator}`)).delegation_responses;
+        console.log("delegations: ", delegations);
+        if (!delegations) continue;
         for (let delegationObj of delegations) {
             const { delegation } = delegationObj;
             // if (delegation.validator_address === "oraivaloper14vcw5qk0tdvknpa38wz46js5g7vrvut8ku5kaa" || delegation.validator_address === "oraivaloper1rqq57xt5r5pnuguffcrltnvkul7n0jdxxdgey0" || delegation.validator_address === "oraivaloper1mxqeldsxg60t2y6gngpdm5jf3k96dnju5el96f") {

@@ -40,6 +40,9 @@ export default async (yargs: Argv) => {
         })
         .option('amount', {
             type: 'string'
+        })
+        .option('market', {
+            type: 'string'
         });
 
     const [address] = argv._.slice(-1);
@@ -52,7 +55,7 @@ export default async (yargs: Argv) => {
 
     // console.log("data: ", data);
     while (true) {
-        let finalElement = data[data.length - 1];
+        let finalElement = data[0];
         let input = JSON.stringify({
             ai_royalty: {
                 get_royalties: {
@@ -83,7 +86,7 @@ const recoverData = async (data, sender, childKey, finalElement, argv) => {
         }
     }))
 
-    const txBody = getHandleMessage("orai1xauzul9c5nfya80rsdv8ey948u5zrwztena58d", input, sender, null);
+    const txBody = getHandleMessage(argv.market, input, sender, null);
     try {
         const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
         console.log(res);

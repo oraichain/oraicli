@@ -15,6 +15,7 @@ const argv = yargs(hideBin(process.argv))
   .alias('help', 'h')
   .alias('version', 'v')
   .command('send [address]', 'send orai token', require('./cmd/send/index').default)
+  .command('drand', 'drand utility', require('./cmd/drand/index').default)
   .command('send-to-one [address]', 'send orai tokens to one address', require('./cmd/send/send-to-one').default)
   .command('multisend [address]', 'send orai token', require('./cmd/send/multisend').default)
   .command('account', 'account commands', require('./cmd/account').default)
@@ -25,6 +26,7 @@ const argv = yargs(hideBin(process.argv))
   .command('distr', 'distribution commands', require('./cmd/distr').default)
   .command('ibc', 'ibc commands', require('./cmd/ibc').default)
   .command('airi', 'airi commands', require('./cmd/airi').default)
+  .command('proposals', 'prososal commands', require('./cmd/proposal').default)
   .option('memo', {
     default: '',
     type: 'string'

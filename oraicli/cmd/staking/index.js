@@ -14,4 +14,5 @@ export default async (yargs: Argv) => {
             type: 'string'
         })
         .command('get-validators', 'Get a list of validators', require('./cmd/get-validators').default)
+        .command('undelegate', 'Undelegate', require('./cmd/undelegate').default)
 };

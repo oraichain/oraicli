@@ -37,7 +37,8 @@ const test = async (round) => {
   // console.log('is correct:', isCorrect3);
 };
 
-const roundToMessage = (round, previous_signature) => {
+const roundToMessage = (round, previous_signature, user_input) => {
+  console.log("user input:", user_input);
   const view = new DataView(new ArrayBuffer(8));
   const roundNum = BigInt(round);
   view.setBigUint64(0, roundNum);
@@ -47,6 +48,9 @@ const roundToMessage = (round, previous_signature) => {
     hash.update(Buffer.from(previous_signature, 'base64'));
   }
   hash.update(view);
+  if (user_input) {
+    hash.update(user_input);
+  }
   const message = hash.digest('hex');
   return message;
 };
@@ -64,6 +68,10 @@ export default async (yargs: Argv) => {
       describe: 'the previous round signature',
       type: 'string'
     })
+    .option('user_input', {
+      describe: 'unique user input',
+      type: 'string'
+    })
     .option('test', {
       describe: 'testing purpose',
       type: 'boolean',
@@ -72,16 +80,16 @@ export default async (yargs: Argv) => {
 
   try {
     const { privateKey } = await cosmos.getChildKey(argv.mnemonic);
-    const { round, previous_signature } = argv;
+    const { round, previous_signature, user_input } = argv;
     if (argv.test) {
       return test(round);
     }
-    const message = roundToMessage(round, previous_signature);
+    const message = roundToMessage(round, previous_signature, user_input);
     const publicKey = getPublicKey(privateKey);
     const signature = await sign(message, privateKey);
-    console.log('Round', round.toString());
+    // console.log('Round', round.toString());
     console.log('publicKey', Buffer.from(publicKey).toString('base64'));
-    console.log('signature', Buffer.from(signature, 'hex').toString('base64'));
+    console.log(Buffer.from(signature, 'hex').toString('base64'));
   } catch (ex) {
     console.log(ex);
   }

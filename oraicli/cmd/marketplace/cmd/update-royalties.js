@@ -81,6 +81,7 @@ export default async (yargs: Argv) => {
 
     let royalties = await getRoyalties(address, argv.nftaddr);
     royalties = royalties.map(r => ({ ...r, royalty: r.royalty * Math.pow(10, 7) > Math.pow(10, 9) ? r.royalty : r.royalty * Math.pow(10, 7) }));
+    // royalties = royalties.filter(r => r.creator_type === "provider");
     console.log("royalties: ", JSON.stringify(royalties));
     console.log("royalty length: ", royalties.length);
     const input = Buffer.from(JSON.stringify({
@@ -90,11 +91,11 @@ export default async (yargs: Argv) => {
     }));
 
     // update royalties
-    // const txBody = getHandleMessage(argv.market, input, sender, argv.amount);
-    // try {
-    //     const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
-    //     console.log(res);
-    // } catch (error) {
-    //     console.log('error: ', error);
-    // }
+    const txBody = getHandleMessage(argv.market, input, sender, argv.amount);
+    try {
+        const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
+        console.log(res);
+    } catch (error) {
+        console.log('error: ', error);
+    }
 };

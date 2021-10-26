@@ -6,6 +6,7 @@ export default async (yargs: Argv) => {
     .command('update-royalties', 'update royalties', require('./cmd/update-royalties').default)
     .command('query-pagination', 'update storage', require('./cmd/query-pagination').default)
     .command('migrate-version', 'migrate marketplace version', require('./cmd/migrate-version').default)
+    .command('migrate-marketplace', 'migrate marketplace version without using too many CLI commands', require('./cmd/migrate-marketplace').default)
     .option('input', {
       describe: 'the input to initilize smart contract',
       default: '{}',

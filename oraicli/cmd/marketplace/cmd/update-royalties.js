@@ -36,6 +36,7 @@ const getRoyalties = async (address, nftAddr) => {
                 get_royalties_contract: {
                     contract_addr: nftAddr,
                     offset: offset,
+                    limit: 30,
                     order: 1
                 }
             }
@@ -80,8 +81,11 @@ export default async (yargs: Argv) => {
     const sender = cosmos.getAddress(childKey);
 
     let royalties = await getRoyalties(address, argv.nftaddr);
-    royalties = royalties.map(r => ({ ...r, royalty: r.royalty * Math.pow(10, 7) > Math.pow(10, 9) ? r.royalty : r.royalty * Math.pow(10, 7) }));
+    // royalties = royalties.map(r => ({ ...r, royalty: r.royalty * Math.pow(10, 7) > Math.pow(10, 9) ? r.royalty : r.royalty * Math.pow(10, 7) }));
     // royalties = royalties.filter(r => r.creator_type === "provider");
+    royalties = royalties.filter(r => r.royalty * Math.pow(10, 7) < Math.pow(10, 9));
+    royalties = royalties.map(r => ({ ...r, royalty: r.royalty * Math.pow(10, 7) }));
+    royalties = royalties.filter(r => r.royalty !== 0);
     console.log("royalties: ", JSON.stringify(royalties));
     console.log("royalty length: ", royalties.length);
     const input = Buffer.from(JSON.stringify({

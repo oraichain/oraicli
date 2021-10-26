@@ -9,7 +9,7 @@ const argv = yargs(hideBin(process.argv))
     // global
     global.cosmos = new Cosmos(config.URL || 'https://lcd.orai.io', config.CHAIN_ID || 'Oraichain');
     cosmos.setBech32MainPrefix('orai');
-    return { mnemonic: config.SEND_MNEMONIC };
+    return { mnemonic: config.SEND_MNEMONIC, minter_mnemonic: config.MINTER_MNEMONIC };
   })
   .default('env', '.env')
   .alias('help', 'h')

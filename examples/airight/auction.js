@@ -25,6 +25,6 @@ const transfrom = () => {
 
 const encoded = transfrom();
 
-const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --input '${encoded}' `;
+const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --input '${encoded}' --gas 4000000`;
 
 executeCMD(command);

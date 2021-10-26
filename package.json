@@ -13,7 +13,8 @@
   },
   "scripts": {
     "oraicli": "node -r @babel/register oraicli",
-    "test": "mocha -r @babel/register test"
+    "test": "mocha -r @babel/register test",
+    "babel-cli": "node -r @babel/register"
   },
   "author": "Cosmostation",
   "license": "MIT",

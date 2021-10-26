@@ -9,11 +9,9 @@ const transfrom = () => {
       creator: process.env.ROYALTY_OWNER,
       mint: {
         mint: {
-          description: 'abcd',
-          image: 'abcdef',
-          name: 'my name',
-          owner: 'orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573',
-          token_id: '23',
+          token_id: '5',
+          to: '',
+          value: '10',
         },
       },
     },
@@ -29,3 +27,5 @@ const encoded = transfrom();
 const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --input '${encoded}' --gas 4000000`;
 
 executeCMD(command);
+
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/C0DD2B27AB92F65E09A9F5C61049690184BAF8F9A787780263C8913DED62E84F

@@ -8,6 +8,8 @@ const transfrom = () => {
   });
 
   console.log(encoded);
+
+  return encoded;
 };
 
 const encoded = transfrom();

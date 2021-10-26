@@ -3,7 +3,7 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     withdraw_nft: {
-      offering_id: 6,
+      offering_id: 7,
     },
   });
 

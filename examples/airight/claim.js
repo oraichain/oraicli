@@ -3,7 +3,7 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     claim_winner: {
-      auction_id: 6,
+      auction_id: 7,
     },
   });
 

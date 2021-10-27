@@ -152,22 +152,24 @@ export default async (yargs: Argv) => {
         // query balance of the marketplace
         const data = await cosmos.get(`/cosmos/bank/v1beta1/balances/${oldmarket}`);
 
-        // withdraw funds to the new marketplace
-        payload = Buffer.from(JSON.stringify({
-            withdraw_funds: {
-                funds: data.balances[0]
-            }
-        }));
+        if (data.balances.length > 0) {
+            // withdraw funds to the new marketplace
+            payload = Buffer.from(JSON.stringify({
+                withdraw_funds: {
+                    funds: data.balances[0]
+                }
+            }));
 
-        txBody = getHandleMessage(oldmarket, payload, sender, amount);
-        res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        console.log(res);
+            txBody = getHandleMessage(oldmarket, payload, sender, amount);
+            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+            console.log(res);
 
-        // transfer funds to the new marketplace
-        txBody = getSendMessage(sender, address, data.balances[0]);
-        res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        console.log(res);
+            // transfer funds to the new marketplace
+            txBody = getSendMessage(sender, address, data.balances[0]);
+            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+            console.log(res);
 
+        }
         // change minter
 
         payload = Buffer.from(JSON.stringify({

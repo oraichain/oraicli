@@ -8,6 +8,13 @@ const transfrom = () => {
     },
   });
 
+  // const encoded = JSON.stringify({
+  //   is_approved_for_all: {
+  //     owner: 'orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573',
+  //     operator: process.env.ROYALTY_CONTRACT,
+  //   },
+  // });
+
   console.log(encoded);
 
   return encoded;

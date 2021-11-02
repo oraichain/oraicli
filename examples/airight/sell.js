@@ -5,8 +5,8 @@ const transfrom = () => {
     sell_nft: {
       contract_addr: process.env.NFT_TOKEN_CONTRACT,
       per_price: '12',
-      amount: '2',
-      token_id: '5',
+      amount: '5',
+      token_id: '8',
     },
   });
 
@@ -21,4 +21,4 @@ const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --inp
 
 executeCMD(command);
 
-// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/65DF7040CF841B8E85830051259A9DBC68D52D7D46425BEBEA88B8AB40E2221A
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/776F70811AA716930204B98466A19320E1E12442261D3A1603305A800B787E76

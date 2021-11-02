@@ -62,6 +62,25 @@ const getHandleMessage = (contract, msg, sender, amount) => {
     });
 };
 
+const getSendMessage = (from_address, to_address, coin) => {
+    const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
+        from_address,
+        to_address,
+        amount: [coin] // 10
+    });
+
+    const msgSendAny = new message.google.protobuf.Any({
+        type_url: '/cosmos.bank.v1beta1.MsgSend',
+        value: message.cosmos.bank.v1beta1.MsgSend.encode(msgSend).finish()
+    });
+
+    const txBody = new message.cosmos.tx.v1beta1.TxBody({
+        messages: [msgSendAny],
+        memo: ""
+    });
+    return txBody;
+};
+
 export default async (yargs: Argv) => {
     const { argv } = yargs
         .positional('file', {
@@ -85,11 +104,14 @@ export default async (yargs: Argv) => {
             type: 'string'
         }).option('nftcontract', {
             type: 'string'
+        })
+        .option('oldmarket', {
+            type: 'string'
         });
 
     const [file] = argv._.slice(-1);
 
-    const { gas, source, mnemonic, fees, label, input, amount, markethub, nftcontract, minter_mnemonic } = argv;
+    const { gas, source, mnemonic, fees, label, input, amount, markethub, nftcontract, minter_mnemonic, oldmarket } = argv;
     const childKey = cosmos.getChildKey(mnemonic);
     const minterChildKey = cosmos.getChildKey(minter_mnemonic);
     const sender = cosmos.getAddress(childKey);
@@ -127,12 +149,32 @@ export default async (yargs: Argv) => {
         res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
         console.log(res);
 
+        // query balance of the marketplace
+        const data = await cosmos.get(`/cosmos/bank/v1beta1/balances/${oldmarket}`);
+
+        if (data.balances.length > 0) {
+            // withdraw funds to the new marketplace
+            payload = Buffer.from(JSON.stringify({
+                withdraw_funds: {
+                    funds: data.balances[0]
+                }
+            }));
+
+            txBody = getHandleMessage(oldmarket, payload, sender, amount);
+            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+            console.log(res);
+
+            // transfer funds to the new marketplace
+            txBody = getSendMessage(sender, address, data.balances[0]);
+            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+            console.log(res);
+
+        }
         // change minter
 
         payload = Buffer.from(JSON.stringify({
             change_minter: address
         }));
-
         txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
         res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
         console.log(res);

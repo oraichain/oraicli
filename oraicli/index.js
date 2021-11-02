@@ -1,4 +1,5 @@
 import yargs from 'yargs/yargs';
+import fs from 'fs';
 import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
 import Cosmos from '@oraichain/cosmosjs';
@@ -8,16 +9,19 @@ const argv = yargs(hideBin(process.argv))
     const config = dotenv.config({ path }).parsed;
     // global
     global.cosmos = new Cosmos(config.URL || 'https://lcd.orai.io', config.CHAIN_ID || 'Oraichain');
-    cosmos.setBech32MainPrefix('orai');
-    return { mnemonic: config.SEND_MNEMONIC, minter_mnemonic: config.MINTER_MNEMONIC };
+    cosmos.setBech32MainPrefix(config.DENOM || 'orai');
+    return { mnemonic: config.MNEMONIC || config.SEND_MNEMONIC, minter_mnemonic: config.MINTER_MNEMONIC };
+  })
+  .config('file-input', (path) => {
+    return { input: fs.readFileSync(path).toString() };
   })
   .default('env', '.env')
   .alias('help', 'h')
   .alias('version', 'v')
-  .command('send [address]', 'send orai token', require('./cmd/send/index').default)
+  .command('send [address]', 'send token', require('./cmd/send/index').default)
   .command('drand', 'drand utility', require('./cmd/drand/index').default)
-  .command('send-to-one [address]', 'send orai tokens to one address', require('./cmd/send/send-to-one').default)
-  .command('multisend [address]', 'send orai token', require('./cmd/send/multisend').default)
+  .command('send-to-one [address]', 'send tokens to one address', require('./cmd/send/send-to-one').default)
+  .command('multisend [address]', 'send token', require('./cmd/send/multisend').default)
   .command('account', 'account commands', require('./cmd/account').default)
   .command('staking', 'staking commands', require('./cmd/staking').default)
   .command('wasm', 'wasm commands', require('./cmd/wasm').default)

@@ -3,7 +3,7 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     claim_winner: {
-      auction_id: 7,
+      auction_id: 11,
     },
   });
 
@@ -18,4 +18,4 @@ const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --inp
 
 executeCMD(command);
 
-// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/55213548130C3196A846094E4E199C4CDFCC2707CA19F1C3BCA1E6C6AD79FC16
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/9AE65DDCEEFEED7D234AEB02254F63230E65AAA1A51D8DE205C977C2D453566D

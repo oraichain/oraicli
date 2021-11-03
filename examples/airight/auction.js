@@ -11,8 +11,8 @@ const transfrom = () => {
       end: 3544319,
       buyout_per_price: '20',
       start_timestamp: new Date().getTime().toString(),
-      end_timestamp: new Date(2021, 10, 27, 3, 24, 0).getTime().toString(),
-      token_id: '5',
+      end_timestamp: new Date(2021, 11, 3, 3, 24, 0).getTime().toString(),
+      token_id: '1363',
     },
   });
 
@@ -27,4 +27,4 @@ const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --inp
 
 executeCMD(command);
 
-// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/7B4B42E295628AE0F11267CC2BFFEA5A075E2B9A5A07BB961D3F83E035388EBE
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/C545C1CA197D0D024AD9CD4332F2CE87F4103C11FDDA9A0AB09A192C20612CED

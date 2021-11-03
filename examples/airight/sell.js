@@ -6,7 +6,7 @@ const transfrom = () => {
       contract_addr: process.env.NFT_TOKEN_CONTRACT,
       per_price: '12',
       amount: '5',
-      token_id: '8',
+      token_id: '1363',
     },
   });
 

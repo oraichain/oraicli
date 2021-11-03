@@ -9,7 +9,7 @@ const transfrom = () => {
       creator: process.env.ROYALTY_OWNER,
       mint: {
         mint: {
-          token_id: '8',
+          token_id: '1363',
           to: '',
           value: '10',
         },
@@ -28,4 +28,4 @@ const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --inp
 
 executeCMD(command);
 
-// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/C0DD2B27AB92F65E09A9F5C61049690184BAF8F9A787780263C8913DED62E84F
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/13265C1604E43AAAD223CF4359CE6F49E7988805F3194D9C32CE2DE066D5FD3B

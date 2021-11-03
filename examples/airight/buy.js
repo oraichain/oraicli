@@ -3,7 +3,7 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     buy_nft: {
-      offering_id: 7,
+      offering_id: 17,
       amount: '1',
     },
   });
@@ -19,4 +19,4 @@ const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --inp
 
 executeCMD(command);
 
-// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/927B3A3478E0A528D513E5954197674D5AF17DB6E2AC3142E76BCCE1836788A9
+// https://testnet-lcd.orai.io/cosmos/tx/v1beta1/txs/D59CD774FA16DAC37C84D434FADA45467CD28C787FB81A9472DCA775B8EB35B6

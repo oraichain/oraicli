@@ -4,7 +4,7 @@ const transfrom = () => {
   const encoded = JSON.stringify({
     burn_nft: {
       contract_addr: process.env.NFT_TOKEN_CONTRACT,
-      token_id: '5',
+      token_id: '1363',
       value: '1',
     },
   });

@@ -173,7 +173,19 @@ export default async (yargs: Argv) => {
         // change minter
 
         payload = Buffer.from(JSON.stringify({
-            change_minter: address
+            change_minter: {
+                minter: address
+            }
+        }));
+        txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
+        res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+        console.log(res);
+
+        // approve the new marketplace
+        payload = Buffer.from(JSON.stringify({
+            approve_all: {
+                operator: address
+            }
         }));
         txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
         res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);

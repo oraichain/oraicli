@@ -4,9 +4,9 @@ const transfrom = () => {
   const encoded = JSON.stringify({
     sell_nft: {
       contract_addr: process.env.NFT_TOKEN_CONTRACT,
-      per_price: '12',
-      amount: '5',
-      token_id: '1363',
+      per_price: '8',
+      amount: '18',
+      token_id: '1372',
     },
   });
 

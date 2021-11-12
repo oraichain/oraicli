@@ -12,7 +12,7 @@ const transfrom = () => {
       buyout_per_price: '20',
       start_timestamp: new Date().getTime().toString(),
       end_timestamp: new Date(2021, 11, 3, 3, 24, 0).getTime().toString(),
-      token_id: '1363',
+      token_id: '1372',
     },
   });
 

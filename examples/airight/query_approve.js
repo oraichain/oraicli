@@ -2,9 +2,9 @@ const { executeCMD } = require('../exec');
 
 const transfrom = () => {
   const encoded = JSON.stringify({
-    balance: {
+    is_approved_for_all: {
       owner: 'orai1nky8s7p7wc0whcmnatyn2spdxqvq6ntk8azd3x',
-      token_id: '1423',
+      operator: process.env.ROYALTY_CONTRACT,
     },
   });
 
@@ -26,4 +26,4 @@ const command = `yarn oraicli wasm query ${process.env.NFT_TOKEN_CONTRACT} --inp
 
 executeCMD(command);
 
-const result = { balance: '9' };
+const result = { approved: false };

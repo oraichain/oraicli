@@ -3,8 +3,8 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     buy_nft: {
-      offering_id: 17,
-      amount: '1',
+      offering_id: 18,
+      amount: '5',
     },
   });
 
@@ -15,7 +15,7 @@ const transfrom = () => {
 
 const encoded = transfrom();
 
-const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --input '${encoded}' --gas 4000000 --amount ${'12'}`;
+const command = `yarn oraicli wasm execute ${process.env.ROYALTY_CONTRACT} --input '${encoded}' --gas 4000000 --amount ${'40'}`;
 
 executeCMD(command);
 

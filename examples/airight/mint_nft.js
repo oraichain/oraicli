@@ -9,9 +9,9 @@ const transfrom = () => {
       creator: process.env.ROYALTY_OWNER,
       mint: {
         mint: {
-          token_id: '1363',
+          token_id: '1372',
           to: '',
-          value: '10',
+          value: '20',
         },
       },
     },

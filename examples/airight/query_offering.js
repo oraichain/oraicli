@@ -5,7 +5,7 @@ const transfrom = () => {
     offering: {
       get_offerings_by_contract_token_id: {
         contract: process.env.NFT_TOKEN_CONTRACT,
-        token_id: '5',
+        token_id: '1410',
       },
     },
   });

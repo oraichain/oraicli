@@ -173,9 +173,7 @@ export default async (yargs: Argv) => {
         // change minter
 
         payload = Buffer.from(JSON.stringify({
-            change_minter: {
-                minter: address
-            }
+            change_minter: address
         }));
         txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
         res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);

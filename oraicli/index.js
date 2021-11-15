@@ -32,6 +32,7 @@ const argv = yargs(hideBin(process.argv))
   .command('ibc', 'ibc commands', require('./cmd/ibc').default)
   .command('airi', 'airi commands', require('./cmd/airi').default)
   .command('proposals', 'prososal commands', require('./cmd/proposal').default)
+  .command('pricefeed', 'pricefeed commands', require('./cmd/pricefeed').default)
   .option('memo', {
     default: '',
     type: 'string'

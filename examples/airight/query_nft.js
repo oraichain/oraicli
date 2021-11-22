@@ -3,8 +3,8 @@ const { executeCMD } = require('../exec');
 const transfrom = () => {
   const encoded = JSON.stringify({
     balance: {
-      owner: 'orai1nky8s7p7wc0whcmnatyn2spdxqvq6ntk8azd3x',
-      token_id: '1423',
+      owner: 'orai1qgfmfre0updedyd72shfj4xwx6nqjkqfwft225',
+      token_id: '1424',
     },
   });
 

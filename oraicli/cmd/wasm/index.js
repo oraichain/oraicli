@@ -5,6 +5,7 @@ export default async (yargs: Argv) => {
     .command('query', 'query a smart contract', require('./cmd/query-smart').default)
     .command('execute', 'execute a smart contract', require('./cmd/execute').default)
     .command('deploy', 'deploy a smart contract', require('./cmd/deploy').default)
+    .command('deploy-cosmjs', 'deploy a smart contract using cosmjs', require('./cmd/deploy-cosmjs').default)
     .option('input', {
       describe: 'the input to initilize smart contract',
       default: '{}',

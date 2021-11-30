@@ -76,7 +76,7 @@ export default async (yargs: Argv) => {
 
   try {
     // console.log('argv fees: ', argv);
-    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), gas);
+    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', !argv.fees ? null : [{ denom: "orai", amount: argv.fees }], gas);
     // console.log('res1: ', res1);
     if (res1.tx_response.code !== 0) {
       console.log('response: ', res1);

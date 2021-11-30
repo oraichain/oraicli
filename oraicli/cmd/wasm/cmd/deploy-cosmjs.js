@@ -42,11 +42,10 @@ export default async (yargs: Argv) => {
   console.log("first account: ", firstAccount);
   const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL || "https://testnet-rpc.orai.io", wallet, { gasPrice: new GasPrice(Decimal.fromUserInput("0", 6), denom), prefix });
   const wasmBody = fs.readFileSync(file);
-  // const fees = { amount: [{ amount: String(0), denom: denom }], gas: "2000000" };
 
-  // update smart contract to collect code id
-  // const uploadResult = await client.upload(firstAccount.address, wasmBody, { source: "" }, "demo upload contract");
-  // console.log("upload result: ", uploadResult);
+  update smart contract to collect code id
+  const uploadResult = await client.upload(firstAccount.address, wasmBody, { source: "" }, "demo upload contract");
+  console.log("upload result: ", uploadResult);
 
   const codeId = uploadResult.codeId;
   const input = JSON.parse(argv.input);

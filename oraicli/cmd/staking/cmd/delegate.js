@@ -12,14 +12,13 @@ export default async (yargs: Argv) => {
   });
 
   const message = Cosmos.message;
-  const sender = cosmos.getAddress(argv.mnemonic);
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const delegator = cosmos.getAddress(argv.mnemonic);
   const { address, amount } = argv;
   let amountParam;
   // if not set amount then delegate available balance, amount is uorai
   if (!parseInt(amount)) {
-    const { balances } = await cosmos.get(`/cosmos/bank/v1beta1/balances/${sender}`);
+    const { balances } = await cosmos.get(`/cosmos/bank/v1beta1/balances/${delegator}`);
     amountParam = balances[0];
   } else {
     amountParam = { denom: cosmos.bech32MainPrefix, amount: amount.toString() };

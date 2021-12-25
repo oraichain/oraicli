@@ -8,7 +8,6 @@ export default async (yargs: Argv) => {
   const { argv } = yargs;
 
   const message = Cosmos.message;
-  const sender = cosmos.getAddress(argv.mnemonic);
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const delegator = cosmos.getAddress(argv.mnemonic);
   const { address, amount } = argv;

@@ -3,6 +3,19 @@ import fs from 'fs';
 import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
 import Cosmos from '@oraichain/cosmosjs';
+import readlineSync from 'readline-sync';
+import { decrypt } from './util';
+
+let password;
+const decryptMnemonic = (mnemonic) => {
+  if (mnemonic && mnemonic.indexOf(' ') === -1) {
+    if (!password) {
+      password = readlineSync.question('enter passphrase:', { hideEchoBack: true });
+    }
+    return decrypt(password, mnemonic);
+  }
+  return mnemonic;
+};
 
 const argv = yargs(hideBin(process.argv))
   .config('env', (path) => {
@@ -10,7 +23,7 @@ const argv = yargs(hideBin(process.argv))
     // global
     global.cosmos = new Cosmos(config.URL || 'https://lcd.orai.io', config.CHAIN_ID || 'Oraichain');
     cosmos.setBech32MainPrefix(config.DENOM || 'orai');
-    return { mnemonic: config.MNEMONIC || config.SEND_MNEMONIC, minter_mnemonic: config.MINTER_MNEMONIC };
+    return { mnemonic: decryptMnemonic(config.MNEMONIC || config.SEND_MNEMONIC), minter_mnemonic: decryptMnemonic(config.MINTER_MNEMONIC) };
   })
   .config('file-input', (path) => {
     return { input: fs.readFileSync(path).toString() };

@@ -5,40 +5,27 @@ import bech32 from 'bech32';
 declare var cosmos: Cosmos;
 
 export default async (yargs: Argv) => {
-  const { argv } = yargs.option('amount', {
-    describe: 'the delegated amount',
-    default: '0',
-    type: 'string'
-  });
+  const { argv } = yargs;
 
   const message = Cosmos.message;
   const sender = cosmos.getAddress(argv.mnemonic);
   const childKey = cosmos.getChildKey(argv.mnemonic);
   const delegator = cosmos.getAddress(argv.mnemonic);
   const { address, amount } = argv;
-  let amountParam;
-  // if not set amount then delegate available balance, amount is uorai
-  if (!parseInt(amount)) {
-    const { balances } = await cosmos.get(`/cosmos/bank/v1beta1/balances/${sender}`);
-    amountParam = balances[0];
-  } else {
-    amountParam = { denom: cosmos.bech32MainPrefix, amount: amount.toString() };
-  }
-  const msgDelegate = new message.cosmos.staking.v1beta1.MsgDelegate({
+  const msg = new message.cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward({
     delegator_address: delegator,
-    validator_address: address,
-    amount: amountParam
+    validator_address: address
   });
 
-  console.log('msg delegate: ', msgDelegate);
+  console.log('msg withdraw: ', msg);
 
-  const msgDelegateAny = new message.google.protobuf.Any({
-    type_url: '/cosmos.staking.v1beta1.MsgDelegate',
-    value: message.cosmos.staking.v1beta1.MsgDelegate.encode(msgDelegate).finish()
+  const msgAny = new message.google.protobuf.Any({
+    type_url: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
+    value: message.cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward.encode(msg).finish()
   });
 
   const txBody = new message.cosmos.tx.v1beta1.TxBody({
-    messages: [msgDelegateAny],
+    messages: [msgAny],
     memo: ''
   });
 

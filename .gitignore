@@ -111,3 +111,4 @@ dist
 *.zip
 
 airi-snapshot/
+lib

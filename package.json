@@ -1,7 +1,7 @@
 {
   "name": "oraicli",
   "licenses": [],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An Oraichain Javascript CLI used to interact with the Oraichain network",
   "main": "oraicli/index.js",
   "bin": {

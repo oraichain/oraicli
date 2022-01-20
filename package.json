@@ -1,9 +1,12 @@
 {
-  "name": "@oraichain/oraicli",
+  "name": "oraicli",
   "licenses": [],
   "version": "0.0.2",
   "description": "An Oraichain Javascript CLI used to interact with the Oraichain network",
   "main": "oraicli/index.js",
+  "bin": {
+    "oraicli": "./oraicli/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oraichain/oraicli.git"
@@ -12,7 +15,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "oraicli": "node -r @babel/register oraicli",
+    "oraicli": "node oraicli",
     "test": "mocha -r @babel/register test"
   },
   "author": "Cosmostation",

@@ -28,7 +28,8 @@ export default async (yargs: Argv) => {
 
             const msgDelegateAny = new message.google.protobuf.Any({
                 type_url: '/cosmos.staking.v1beta1.MsgUndelegate',
-                value: message.cosmos.staking.v1beta1.MsgUndelegate.encode(msgDelegate).finish()
+                value: message.cosmos.staking.v1beta1.MsgUndelegate.encode(msgDelegate).finish(),
+                value_raw: msgDelegate,
             });
 
             const txBody = new message.cosmos.tx.v1beta1.TxBody({

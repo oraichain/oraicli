@@ -15,7 +15,8 @@ const getStoreMessage = (wasm_byte_code, sender, source) => {
 
   const msgSendAny = new message.google.protobuf.Any({
     type_url: '/cosmwasm.wasm.v1beta1.MsgStoreCode',
-    value: message.cosmwasm.wasm.v1beta1.MsgStoreCode.encode(msgSend).finish()
+    value: message.cosmwasm.wasm.v1beta1.MsgStoreCode.encode(msgSend).finish(),
+    value_raw: msgSend,
   });
 
   return new message.cosmos.tx.v1beta1.TxBody({
@@ -30,12 +31,13 @@ const getInstantiateMessage = (code_id, init_msg, sender, label = '', amount = '
     init_msg,
     label,
     sender,
-    sent_funds
+    init_funds
   });
 
   const msgSendAny = new message.google.protobuf.Any({
     type_url: '/cosmwasm.wasm.v1beta1.MsgInstantiateContract',
-    value: message.cosmwasm.wasm.v1beta1.MsgInstantiateContract.encode(msgSend).finish()
+    value: message.cosmwasm.wasm.v1beta1.MsgInstantiateContract.encode(msgSend).finish(),
+    value_raw: { ...msgSend, init_msg: JSON.parse(msgSend.init_msg.toString('ascii')) },
   });
 
   return new message.cosmos.tx.v1beta1.TxBody({
@@ -76,18 +78,18 @@ export default async (yargs: Argv) => {
 
   try {
     // console.log('argv fees: ', argv);
-    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', !argv.fees ? null : [{ denom: "orai", amount: argv.fees }], gas);
-    // console.log('res1: ', res1);
+    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', 0.0025, 'auto');
+    // const res1 = await cosmos.simulate(childKey.publicKey, txBody1);
+    console.log('res1: ', res1);
     if (res1.tx_response.code !== 0) {
       console.log('response: ', res1);
     }
-    console.log('res1: ', res1);
 
     // next instantiate code
     const codeId = res1.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
-    const input = Buffer.from(argv.input).toString('base64');
+    const input = Buffer.from(argv.input);
     const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
-    const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), gas);
+    const res2 = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', 0.0025, 5000000);
 
     console.log(res2);
     let address = JSON.parse(res2.tx_response.raw_log)[0].events[1].attributes[0].value;

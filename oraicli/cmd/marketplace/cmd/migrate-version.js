@@ -32,14 +32,15 @@ const getNfts = async (owner, address) => {
         const input = JSON.stringify({
             tokens: {
                 owner,
-                start_after: offset
+                start_after: offset,
+                limit: 30
             }
         });
         console.log(`${url}/wasm/v1beta1/contract/${address}/smart/${Buffer.from(input).toString('base64')}`);
         data = await cosmos.get(`/wasm/v1beta1/contract/${address}/smart/${Buffer.from(input).toString('base64')}`);
         nfts = nfts.concat(data.data.tokens);
-        console.log("data: ", data.data.tokens);
-        console.log("nfts: ", nfts[nfts.length - 1]);
+        // console.log("data: ", data.data.tokens);
+        // console.log("nfts: ", nfts[nfts.length - 1]);
         offset = nfts[nfts.length - 1];
     } while (data.data.tokens.length > 0);
     nfts = [...new Set(nfts)];
@@ -55,7 +56,7 @@ export default async (yargs: Argv) => {
         .option('amount', {
             type: 'string'
         })
-        .option('market', {
+        .option('newmarket', {
             type: 'string'
         })
         .option('nftaddr', {
@@ -68,22 +69,26 @@ export default async (yargs: Argv) => {
     const sender = cosmos.getAddress(childKey);
 
     let nfts = await getNfts(address, argv.nftaddr);
-    console.log("nfts: ", JSON.stringify(nfts));
+    // console.log("nfts: ", JSON.stringify(nfts));
     console.log("nft length: ", nfts.length);
-    const input = Buffer.from(JSON.stringify({
+    const inp = JSON.stringify({
         migrate_version: {
             nft_contract_addr: argv.nftaddr,
             token_ids: nfts,
-            new_marketplace: argv.market
+            new_marketplace: argv.newmarket
         }
-    }));
+    });
+    console.log("input: ", inp);
+    const input = Buffer.from(inp);
 
-    // update nfts
-    const txBody = getHandleMessage(address, input, sender, argv.amount);
-    try {
-        const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), argv.gas);
-        console.log(res);
-    } catch (error) {
-        console.log('error: ', error);
-    }
+    // // // update nfts
+    // const txBody = getHandleMessage(address, input, sender, argv.amount);
+    // try {
+    //     const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 5000000000);
+    //     console.log(res);
+    // } catch (error) {
+    //     console.log('error: ', error);
+    // }
 };
+
+// yarn oraicli marketplace migrate-version orai17jjedrl7ytflnj3djygwvtsqgwya9hl6xxtjpl --nftaddr orai1ase8wkkhczqdda83f0cd9lnuyvf47465j70hyk --newmarket orai10kkcjrg8plsmc6vfc9wsvetjqsgz9aqe8yjktw

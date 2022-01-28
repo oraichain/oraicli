@@ -57,7 +57,8 @@ export default async (yargs: Argv) => {
 
   const msgMultiSendAny = new message.google.protobuf.Any({
     type_url: '/cosmos.bank.v1beta1.MsgMultiSend',
-    value: message.cosmos.bank.v1beta1.MsgMultiSend.encode(msgMultiSend).finish()
+    value: message.cosmos.bank.v1beta1.MsgMultiSend.encode(msgMultiSend).finish(),
+    value_raw: msgMultiSend,
   });
 
   const txBody = new message.cosmos.tx.v1beta1.TxBody({
@@ -66,7 +67,7 @@ export default async (yargs: Argv) => {
   });
 
   try {
-    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
+    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 'auto');
     console.log(response);
   } catch (ex) {
     console.log(ex);

@@ -137,8 +137,10 @@ export default async (yargs: Argv) => {
 
         console.log(res);
         let address = JSON.parse(res.tx_response.raw_log)[0].events[1].attributes[0].value;
+        console.log("address: ", address);
 
         // update markethub implementation
+        console.log("update markethub imple");
         payload = Buffer.from(JSON.stringify({
             update_implementation: {
                 implementation: address
@@ -154,6 +156,7 @@ export default async (yargs: Argv) => {
 
         if (data.balances.length > 0) {
             // withdraw funds to the new marketplace
+            console.log("withdraw funds to new marketplace");
             payload = Buffer.from(JSON.stringify({
                 withdraw_funds: {
                     funds: data.balances[0]
@@ -170,24 +173,26 @@ export default async (yargs: Argv) => {
             console.log(res);
 
         }
-        // change minter
+        // // change minter
+        // console.log("change minter");
 
-        payload = Buffer.from(JSON.stringify({
-            change_minter: address
-        }));
-        txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
-        res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        console.log(res);
+        // payload = Buffer.from(JSON.stringify({
+        //     change_minter: address
+        // }));
+        // txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
+        // res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+        // console.log(res);
 
-        // approve the new marketplace
-        payload = Buffer.from(JSON.stringify({
-            approve_all: {
-                operator: address
-            }
-        }));
-        txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
-        res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        console.log(res);
+        // // approve the new marketplace
+        // console.log("approve new marketplace");
+        // payload = Buffer.from(JSON.stringify({
+        //     approve_all: {
+        //         operator: address
+        //     }
+        // }));
+        // txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
+        // res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
+        // console.log(res);
 
         console.log('contract address: ', address);
 
@@ -195,3 +200,5 @@ export default async (yargs: Argv) => {
         console.log("error: ", error);
     }
 };
+
+// yarn oraicli marketplace migrate-marketplace ../oraiwasm/package/plus/market_1155_implementation/artifacts/market_1155_implementation.wasm --input '{"name":"datahub market implementation v2.0","fee":20,"denom":"orai","governance":"orai1ppzl4ehvjtkfy7vgraqgjl6a7yunxtgrc77tt7","max_royalty":1000000000,"auction_duration":"3600000","step_price":1}' --label 'production market datahub implementation v2.0' --gas 30000000 --markethub orai1ppzl4ehvjtkfy7vgraqgjl6a7yunxtgrc77tt7 --nftcontract orai12rrurv3qynk50tuz8eh825ku3zxdk553r4sxfn --oldmarket orai1kmvtsnv2s8xevgxajf5jl76ndy597mjlche0kp

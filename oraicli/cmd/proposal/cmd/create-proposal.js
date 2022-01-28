@@ -26,7 +26,8 @@ export default async (yargs: Argv) => {
 
   const createProposalMsgAny = new message.google.protobuf.Any({
     type_url: '/cosmos.params.v1beta1.ParameterChangeProposal',
-    value: message.cosmos.params.v1beta1.ParameterChangeProposal.encode(createProposal).finish()
+    value: message.cosmos.params.v1beta1.ParameterChangeProposal.encode(createProposal).finish(),
+    value_raw: createProposal,
   });
 
   const msgGov = new message.cosmos.gov.v1beta1.MsgSubmitProposal({
@@ -37,15 +38,17 @@ export default async (yargs: Argv) => {
 
   const msgGovAny = new message.google.protobuf.Any({
     type_url: '/cosmos.gov.v1beta1.MsgSubmitProposal',
-    value: message.cosmos.gov.v1beta1.MsgSubmitProposal.encode(msgGov).finish()
+    value: message.cosmos.gov.v1beta1.MsgSubmitProposal.encode(msgGov).finish(),
+    value_raw: msgGov
   });
 
   const txBody = new message.cosmos.tx.v1beta1.TxBody({
     messages: [msgGovAny]
   });
 
+
   try {
-    const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
+    const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 'auto');
     console.log(res);
   } catch (error) {
     console.log('error: ', error);

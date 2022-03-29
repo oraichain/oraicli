@@ -18,6 +18,7 @@ const decryptMnemonic = (mnemonic) => {
 };
 
 const argv = yargs(hideBin(process.argv))
+  .scriptName('oraicli')
   .config('env', (path) => {
     const config = dotenv.config({ path }).parsed;
     // global

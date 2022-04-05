@@ -13,6 +13,10 @@ export default async (yargs: Argv) => {
     .option('amount', {
       default: '1',
       type: 'string'
+    })
+    .option('denom', {
+      default: 'orai',
+      type: 'string'
     });
   const [to_address] = argv._.slice(-1);
 
@@ -24,7 +28,7 @@ export default async (yargs: Argv) => {
   const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
     from_address: cosmos.getAddress(childKey),
     to_address,
-    amount: [{ denom: cosmos.bech32MainPrefix, amount: argv.amount }] // 10
+    amount: [{ denom: argv.denom ? argv.denom : cosmos.bech32MainPrefix, amount: argv.amount }] // 10
   });
 
   const msgSendAny = new message.google.protobuf.Any({
@@ -39,7 +43,7 @@ export default async (yargs: Argv) => {
   });
 
   try {
-    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 'auto');
+    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 5000000);
     // const response = await cosmos.simulate(childKey.publicKey, txBody);
     console.log(response);
   } catch (ex) {

@@ -53,7 +53,7 @@ export default async (yargs: Argv) => {
 
   try {
     // console.log('argv fees: ', argv);
-    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', 0.0025, 5000000);
+    const res1 = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', 0, 5000000);
     // const res1 = await cosmos.simulate(childKey.publicKey, txBody1);
     console.log('res1: ', res1);
     if (res1.tx_response.code !== 0) {

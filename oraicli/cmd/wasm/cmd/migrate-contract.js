@@ -51,7 +51,7 @@ export default async (yargs: Argv) => {
     const txBody = getMigrateMsg(sender, contract, code_id, Buffer.from(input));
 
     try {
-        const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', 0, 601000000);
+        const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', 0, 6010000000);
         console.log('response: ', response);
     } catch (error) {
         console.log("error: ", error);

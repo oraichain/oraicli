@@ -67,7 +67,7 @@ export default async (yargs: Argv) => {
   });
 
   try {
-    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 'auto');
+    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), 71117931);
     console.log(response);
   } catch (ex) {
     console.log(ex);

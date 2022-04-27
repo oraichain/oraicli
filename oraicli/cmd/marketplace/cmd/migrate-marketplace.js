@@ -56,11 +56,10 @@ const getHandleMessage = (contract, msg, sender, amount) => {
         type_url: '/cosmwasm.wasm.v1beta1.MsgExecuteContract',
         value: message.cosmwasm.wasm.v1beta1.MsgExecuteContract.encode(msgSend).finish()
     });
-
-    return new message.cosmos.tx.v1beta1.TxBody({
-        messages: [msgSendAny]
-    });
+    return msgSendAny
 };
+
+
 
 const getSendMessage = (from_address, to_address, coin) => {
     const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
@@ -73,36 +72,17 @@ const getSendMessage = (from_address, to_address, coin) => {
         type_url: '/cosmos.bank.v1beta1.MsgSend',
         value: message.cosmos.bank.v1beta1.MsgSend.encode(msgSend).finish()
     });
-
-    const txBody = new message.cosmos.tx.v1beta1.TxBody({
-        messages: [msgSendAny],
-        memo: ""
-    });
-    return txBody;
+    return msgSendAny;
 };
 
 export default async (yargs: Argv) => {
     const { argv } = yargs
-        .positional('file', {
-            describe: 'the smart contract file',
+        .option('markethub', {
+            type: 'string'
+        }).option('newmarket', {
             type: 'string'
         })
-        .option('label', {
-            describe: 'the label of smart contract',
-            type: 'string'
-        })
-        .option('source', {
-            describe: 'the source code of the smart contract',
-            type: 'string'
-        })
-        .option('fees', {
-            describe: 'the transaction fees',
-            type: 'string'
-        }).option('amount', {
-            type: 'string'
-        }).option('markethub', {
-            type: 'string'
-        }).option('nftcontract', {
+        .option('nftcontract', {
             type: 'string'
         })
         .option('oldmarket', {
@@ -111,50 +91,33 @@ export default async (yargs: Argv) => {
 
     const [file] = argv._.slice(-1);
 
-    const { gas, source, mnemonic, fees, label, input, amount, markethub, nftcontract, minter_mnemonic, oldmarket } = argv;
+    const { gas, mnemonic, input, markethub, minter_mnemonic, newmarket, oldmarket, nftcontract } = argv;
     const childKey = cosmos.getChildKey(mnemonic);
     const minterChildKey = cosmos.getChildKey(minter_mnemonic);
     const sender = cosmos.getAddress(childKey);
     const minterSender = cosmos.getAddress(minterChildKey);
+    const fees = 0;
 
-    const wasmBody = fs.readFileSync(file).toString('base64');
-
-    let txBody = getStoreMessage(wasmBody, sender, source);
+    let messages = [];
 
     try {
-        let res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        // console.log('res: ', res);
-        if (res.tx_response.code !== 0) {
-            console.log('response: ', res);
-        }
-        console.log('res: ', res);
-
-        // next instantiate code
-        const codeId = res.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
-        let payload = Buffer.from(input).toString('base64');
-        txBody = getInstantiateMessage(codeId, payload, sender, label);
-        res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-
-        console.log(res);
-        let address = JSON.parse(res.tx_response.raw_log)[0].events[1].attributes[0].value;
+        let address = newmarket;
         console.log("address: ", address);
 
         // update markethub implementation
         console.log("update markethub imple");
-        payload = Buffer.from(JSON.stringify({
+        let payload = Buffer.from(JSON.stringify({
             update_implementation: {
                 implementation: address
             }
         }));
 
-        txBody = getHandleMessage(markethub, payload, sender, amount);
-        res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        console.log(res);
+        messages.push(getHandleMessage(markethub, payload, sender));
 
         // query balance of the marketplace
         const data = await cosmos.get(`/cosmos/bank/v1beta1/balances/${oldmarket}`);
 
-        if (data.balances.length > 0) {
+        if (+data.balances[0].amount > 0) {
             // withdraw funds to the new marketplace
             console.log("withdraw funds to new marketplace");
             payload = Buffer.from(JSON.stringify({
@@ -163,42 +126,30 @@ export default async (yargs: Argv) => {
                 }
             }));
 
-            txBody = getHandleMessage(oldmarket, payload, sender, amount);
-            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-            console.log(res);
+            messages.push(getHandleMessage(oldmarket, payload, sender));
+            console.log("data balance: ", data.balances)
 
             // transfer funds to the new marketplace
-            txBody = getSendMessage(sender, address, data.balances[0]);
-            res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-            console.log(res);
-
+            messages.push(getSendMessage(sender, address, data.balances[0]));
         }
         // // change minter
-        // console.log("change minter");
+        console.log("change minter");
 
-        // payload = Buffer.from(JSON.stringify({
-        //     change_minter: address
-        // }));
-        // txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
-        // res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        // console.log(res);
-
-        // // approve the new marketplace
-        // console.log("approve new marketplace");
-        // payload = Buffer.from(JSON.stringify({
-        //     approve_all: {
-        //         operator: address
-        //     }
-        // }));
-        // txBody = getHandleMessage(nftcontract, payload, minterSender, amount);
-        // res = await cosmos.submit(minterChildKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(fees) ? 0 : parseInt(fees), gas);
-        // console.log(res);
-
-        console.log('contract address: ', address);
+        payload = Buffer.from(JSON.stringify({
+            change_minter: {
+                minter: address
+            }
+        }));
+        messages.push(getHandleMessage(nftcontract, payload, sender));
+        const txBody = new message.cosmos.tx.v1beta1.TxBody({
+            messages
+        })
+        const res = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', 0, gas);
+        console.log(res);
 
     } catch (error) {
         console.log("error: ", error);
     }
 };
 
-// yarn oraicli marketplace migrate-marketplace ../oraiwasm/package/plus/market_1155_implementation/artifacts/market_1155_implementation.wasm --input '{"name":"datahub market implementation v2.0","fee":20,"denom":"orai","governance":"orai1ppzl4ehvjtkfy7vgraqgjl6a7yunxtgrc77tt7","max_royalty":1000000000,"auction_duration":"3600000","step_price":1}' --label 'production market datahub implementation v2.0' --gas 30000000 --markethub orai1ppzl4ehvjtkfy7vgraqgjl6a7yunxtgrc77tt7 --nftcontract orai12rrurv3qynk50tuz8eh825ku3zxdk553r4sxfn --oldmarket orai1kmvtsnv2s8xevgxajf5jl76ndy597mjlche0kp
+// yarn oraicli marketplace migrate - marketplace--markethub orai14tqq093nu88tzs7ryyslr78sm3tzrmnpem6fak--newmarket orai1m0cdln6klzlsk87jww9wwr7ksasa6cnava28j5--oldmarket orai1s22g3qfl48fq04yatzphd49tjcpja0u7uaancl--nftcontract orai1c3phe2dcu852ypgvt0peqj8f5kx4x0s4zqcky4--gas 30000000

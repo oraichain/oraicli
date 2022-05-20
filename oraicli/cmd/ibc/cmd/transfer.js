@@ -1,5 +1,6 @@
 import { Argv } from 'yargs';
 import Cosmos from '@oraichain/cosmosjs';
+import Long from 'long'
 declare var cosmos: Cosmos;
 
 export default async (yargs: Argv) => {
@@ -11,6 +12,10 @@ export default async (yargs: Argv) => {
     .option('amount', {
       default: '1',
       type: 'string'
+    })
+    .option('denom', {
+      default: 'orai',
+      type: 'string',
     })
     .option('timeout', {
       default: 60,
@@ -36,8 +41,11 @@ export default async (yargs: Argv) => {
     source_port: argv.port,
     sender,
     receiver: address,
-    token: { denom: cosmos.bech32MainPrefix, amount: argv.amount },
-    timeout_timestamp: (Date.now() + argv.timeout * 1000) * 10 ** 6
+    token: { denom: argv.denom, amount: argv.amount },
+    // timeout_timestamp: (Date.now() + argv.timeout * 1000)
+    timeout_height: {
+      revision_height: 7056039, revision_number: 7056039
+    }
   });
 
   const msgSendAny = new message.google.protobuf.Any({

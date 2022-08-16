@@ -1,9 +1,12 @@
 {
-  "name": "@oraichain/oraicli",
+  "name": "oraicli",
   "licenses": [],
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "An Oraichain Javascript CLI used to interact with the Oraichain network",
-  "main": "oraicli/index.js",
+  "main": "src/index.js",
+  "bin": {
+    "oraicli": "./lib/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oraichain/oraicli.git"
@@ -12,7 +15,8 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "oraicli": "node -r @babel/register oraicli",
+    "oraicli": "node -r @babel/register src",
+    "build": "babel src -d lib",
     "test": "mocha -r @babel/register test"
   },
   "author": "Cosmostation",
@@ -35,12 +39,14 @@
     "js-sha3": "^0.8.0",
     "ksuid": "^2.0.0",
     "noble-bls12-381": "^0.13.1",
+    "readline-sync": "^1.4.10",
     "request": "^2.88.2",
     "secp256k1": "^4.0.2",
     "xlsx": "^0.16.9",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.16.8",
     "@babel/core": "^7.13.8",
     "@babel/plugin-transform-runtime": "^7.13.8",
     "@babel/preset-env": "^7.13.8",

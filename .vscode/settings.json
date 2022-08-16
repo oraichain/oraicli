@@ -1,4 +1,5 @@
 {
     "javascript.validate.enable": false,
-    "prettier.printWidth": 200
+    "prettier.printWidth": 200,
+    "typescript.tsdk": "types"
 }

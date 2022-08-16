@@ -3,6 +3,7 @@ export default async (yargs: Argv) => {
     yargs
         .usage('usage: $0 staking <command> [options]')
         .command('delegate', 'Delegate to a validator', require('./cmd/delegate').default)
+        .command('withdraw-commission', 'Withdraw commission', require('./cmd/withdraw-commission').default)
         .option('address', {
             describe: 'validator operator address to delegate to',
             default: '',

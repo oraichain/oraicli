@@ -47,7 +47,7 @@ export const instantiate = async (argv) => {
 export default async (yargs: Argv) => {
   const { argv } = yargs
 
-    .option('codeid', {
+    .option('code-id', {
       describe: 'the code id of the smart contract',
       type: 'number'
     })

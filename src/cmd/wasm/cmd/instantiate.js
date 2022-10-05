@@ -1,12 +1,14 @@
 import { Argv } from 'yargs';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
+import { Decimal } from '@cosmjs/math';
+import { GasPrice } from '@cosmjs/stargate';
 
 export const instantiate = async (argv) => {
   const { gas, source, codeId, label } = argv;
-
+  const prefix = process.env.PREFIX || 'orai';
+  const denom = process.env.DENOM || 'orai';
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
-    hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
     prefix
   });
   const [firstAccount] = await wallet.getAccounts();
@@ -19,7 +21,7 @@ export const instantiate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.instantiate(firstAccount.address, codeId, input, label);
+    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto');
 
     console.log(res.contractAddress);
     return res.contractAddress;

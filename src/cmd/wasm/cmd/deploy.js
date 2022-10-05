@@ -17,10 +17,6 @@ export default async (yargs: Argv) => {
       describe: 'the label of smart contract',
       type: 'string'
     })
-    .option('source', {
-      describe: 'the source code of the smart contract',
-      type: 'string'
-    })
     .option('fees', {
       describe: 'the transaction fees',
       type: 'string'
@@ -45,12 +41,12 @@ export default async (yargs: Argv) => {
   const wasmBody = fs.readFileSync(file);
 
   // update smart contract to collect code id
-  const uploadResult = await client.upload(firstAccount.address, wasmBody, { source: argv.source }, 'demo upload contract');
+  const uploadResult = await client.upload(firstAccount.address, wasmBody, 'auto');
   console.log('upload result: ', uploadResult);
 
   const codeId = uploadResult.codeId;
   const input = JSON.parse(argv.input);
 
-  const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, 'demo contract');
+  const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, argv.label, 'auto');
   console.log('instantiate result: ', instantiateResult);
 };

@@ -1,17 +1,19 @@
 import { Argv } from 'yargs';
 import fs from 'fs';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import { Decimal } from '@cosmjs/math';
+import { GasPrice } from '@cosmjs/stargate';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 
 export const upload = async (argv) => {
   const [file] = argv._.slice(-1);
-
+  const prefix = process.env.PREFIX || 'orai';
+  const denom = process.env.DENOM || 'orai';
   const { gas, source } = argv;
 
   const wasmBody = fs.readFileSync(file);
 
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
-    hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
     prefix
   });
   const [firstAccount] = await wallet.getAccounts();
@@ -22,7 +24,8 @@ export const upload = async (argv) => {
 
   try {
     // console.log('argv fees: ', argv);
-    let res = await client.upload(firstAccount.address, wasmBody);
+    let res = await client.upload(firstAccount.address, wasmBody, 'auto');
+    console.log(res.codeId);
     return res.codeId;
   } catch (error) {
     console.log('error: ', error);
@@ -33,10 +36,6 @@ export default async (yargs: Argv) => {
   const { argv } = yargs
     .positional('file', {
       describe: 'the smart contract file',
-      type: 'string'
-    })
-    .option('source', {
-      describe: 'the source code of the smart contract',
       type: 'string'
     })
     .option('fees', {

@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { assertIsBroadcastTxSuccess, SigningStargateClient, StargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { stringToPath } from '@cosmjs/crypto';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 import { Decimal } from '@cosmjs/math';

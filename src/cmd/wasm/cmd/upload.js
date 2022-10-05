@@ -1,5 +1,6 @@
 import { Argv } from 'yargs';
 import fs from 'fs';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 
 export const upload = async (argv) => {
@@ -21,7 +22,7 @@ export const upload = async (argv) => {
 
   try {
     // console.log('argv fees: ', argv);
-    let res = await client.upload(firstAccount, wasmBody);
+    let res = await client.upload(firstAccount.address, wasmBody);
     return res.codeId;
   } catch (error) {
     console.log('error: ', error);

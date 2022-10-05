@@ -1,4 +1,5 @@
 import { Argv } from 'yargs';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 
 export const instantiate = async (argv) => {
@@ -18,7 +19,7 @@ export const instantiate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.instantiate(firstAccount, codeId, input, label);
+    const res = await client.instantiate(firstAccount.address, codeId, input, label);
 
     console.log(res.contractAddress);
     return res.contractAddress;

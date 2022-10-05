@@ -1,44 +1,28 @@
 import { Argv } from 'yargs';
 import fs from 'fs';
-import Cosmos from '@oraichain/cosmosjs';
-
-const message = Cosmos.message;
-
-const getStoreMessage = (wasm_byte_code, sender, source) => {
-  const msgSend = new message.cosmwasm.wasm.v1beta1.MsgStoreCode({
-    wasm_byte_code,
-    sender,
-    source
-  });
-
-  const msgSendAny = new message.google.protobuf.Any({
-    type_url: '/cosmwasm.wasm.v1beta1.MsgStoreCode',
-    value: message.cosmwasm.wasm.v1beta1.MsgStoreCode.encode(msgSend).finish()
-  });
-
-  return new message.cosmos.tx.v1beta1.TxBody({
-    messages: [msgSendAny]
-  });
-};
+import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 
 export const upload = async (argv) => {
   const [file] = argv._.slice(-1);
 
-  const childKey = cosmos.getChildKey(argv.mnemonic);
-  const sender = cosmos.getAddress(childKey);
   const { gas, source } = argv;
 
-  const wasmBody = fs.readFileSync(file).toString('base64');
+  const wasmBody = fs.readFileSync(file);
 
-  const txBody1 = getStoreMessage(wasmBody, sender, source ? fs.readFileSync(source).toString() : '');
+  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
+    hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
+    prefix
+  });
+  const [firstAccount] = await wallet.getAccounts();
+  const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
+    gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
+    prefix
+  });
 
   try {
     // console.log('argv fees: ', argv);
-    const res = await cosmos.submit(childKey, txBody1, 'BROADCAST_MODE_BLOCK', !argv.fees ? null : [{ denom: 'orai', amount: argv.fees }], gas);
-    // console.log('res: ', res);
-    console.log('res: ', res);
-    const codeId = res.tx_response.logs[0].events[0].attributes.find((attr) => attr.key === 'code_id').value;
-    return codeId;
+    let res = await client.upload(firstAccount, wasmBody);
+    return res.codeId;
   } catch (error) {
     console.log('error: ', error);
   }

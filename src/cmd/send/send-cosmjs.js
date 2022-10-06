@@ -21,7 +21,7 @@ export default async (yargs: Argv) => {
     prefix: denom
   });
   const [firstAccount] = await wallet.getAccounts();
-  console.log('first account: ', firstAccount);
+
   const client = await SigningStargateClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet);
   const amount = { denom: 'orai', amount: argv.amount };
   console.log('amount: ', amount);

@@ -24,7 +24,7 @@ export default async (yargs: Argv) => {
     prefix
   });
   const [firstAccount] = await wallet.getAccounts();
-  console.log('first account: ', firstAccount);
+
   const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
     gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
     prefix

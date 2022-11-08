@@ -12,7 +12,7 @@ export const instantiate = async (argv) => {
     prefix
   });
   const [firstAccount] = await wallet.getAccounts();
-  const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
+  const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL, wallet, {
     gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
     prefix
   });

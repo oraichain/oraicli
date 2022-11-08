@@ -1,5 +1,8 @@
 import { Argv } from 'yargs';
-import Cosmos from '@oraichain/cosmosjs';
+import { SigningStargateClient, StargateClient, GasPrice } from '@cosmjs/stargate';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import { stringToPath } from '@cosmjs/crypto';
+import { Decimal } from '@cosmjs/math';
 
 export default async (yargs: Argv) => {
   const { argv } = yargs
@@ -13,32 +16,21 @@ export default async (yargs: Argv) => {
       type: 'string'
     });
   const [to_address] = argv._.slice(-1);
+  const { amount } = argv;
 
-  const message = Cosmos.message;
-  const childKey = cosmos.getChildKey(argv.mnemonic);
-  const address = cosmos.getAddress(childKey);
-  console.log('from: ', address);
+  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
+    hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
+    prefix: "orai"
+  });
+  const [firstAccount] = await wallet.getAccounts();
 
-  const msgSend = new message.cosmos.bank.v1beta1.MsgSend({
-    from_address: cosmos.getAddress(childKey),
-    to_address,
-    amount: [{ denom: cosmos.bech32MainPrefix, amount: argv.amount }] // 10
+  const client = await SigningStargateClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
+    gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), "orai"),
+    prefix: "orai"
   });
 
-  const msgSendAny = new message.google.protobuf.Any({
-    type_url: '/cosmos.bank.v1beta1.MsgSend',
-    value: message.cosmos.bank.v1beta1.MsgSend.encode(msgSend).finish()
-  });
+  console.log("sender address: ", firstAccount.address)
 
-  const txBody = new message.cosmos.tx.v1beta1.TxBody({
-    messages: [msgSendAny],
-    memo: argv.memo
-  });
-
-  try {
-    const response = await cosmos.submit(childKey, txBody, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees));
-    console.log(response);
-  } catch (ex) {
-    console.log(ex);
-  }
+  const result = await client.sendTokens(firstAccount.address, to_address, [{ denom: "orai", amount: amount.toString() }], "auto");
+  console.log("send result: ", result);
 };

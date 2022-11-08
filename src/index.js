@@ -24,7 +24,7 @@ const argv = yargs(hideBin(process.argv))
     // global
     global.cosmos = new Cosmos(config.URL || 'https://lcd.orai.io', config.CHAIN_ID || 'Oraichain');
     cosmos.setBech32MainPrefix(config.DENOM || 'orai');
-    return { mnemonic: decryptMnemonic(config.MNEMONIC || config.SEND_MNEMONIC), minter_mnemonic: decryptMnemonic(config.MINTER_MNEMONIC) };
+    return { mnemonic: decryptMnemonic(config.MNEMONIC || config.SEND_MNEMONIC), minter_mnemonic: decryptMnemonic(config.MINTER_MNEMONIC), rpc_url: config.RPC_URL };
   })
   .config('file-input', (path) => {
     return { input: fs.readFileSync(path).toString() };

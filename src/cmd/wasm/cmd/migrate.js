@@ -22,7 +22,7 @@ export const migrate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.migrate(firstAccount.address, address, codeId, {}, 'auto');
+    const res = await client.migrate(firstAccount.address, address, codeId, input, 'auto');
 
     console.log(res);
   } catch (error) {

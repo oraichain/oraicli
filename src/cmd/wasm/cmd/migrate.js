@@ -1,11 +1,34 @@
 import { Argv } from 'yargs';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
-import { stringToPath } from '@cosmjs/crypto';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
 import { Decimal } from '@cosmjs/math';
 import { GasPrice } from '@cosmjs/stargate';
-import fs from 'fs';
+
+export const migrate = async (argv) => {
+    const [address] = argv._.slice(-1);
+    const { codeId } = argv;
+    const prefix = process.env.PREFIX || 'orai';
+    const denom = process.env.DENOM || 'orai';
+    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
+        prefix
+    });
+    const [firstAccount] = await wallet.getAccounts();
+    const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL, wallet, {
+        gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
+        prefix
+    });
+
+    try {
+        // next instantiate code
+        const input = JSON.parse(argv.input);
+
+        const res = await client.migrate(firstAccount.address, address, codeId, input, 'auto');
+
+        console.log(res);
+    } catch (error) {
+        console.log('error: ', error);
+    }
+};
 
 export default async (yargs: Argv) => {
     const { argv } = yargs
@@ -13,27 +36,9 @@ export default async (yargs: Argv) => {
             describe: 'the smart contract address',
             type: 'string'
         })
-        .option('amount', {
-            type: 'string'
-        })
-        .option('new_codeid', {
+        .option('code-id', {
+            describe: 'the code id of the smart contract',
             type: 'number'
         });
-    const [address] = argv._.slice(-1);
-    const prefix = process.env.PREFIX || 'orai';
-    const denom = process.env.DENOM || 'orai';
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
-        hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
-        prefix
-    });
-    const [firstAccount] = await wallet.getAccounts();
-
-    const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
-        gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
-        prefix
-    });
-    const amount = [{ amount, denom }];
-    const input = JSON.parse(argv.input);
-    const result = await client.migrate(firstAccount.address, address, argv.new_codeid, input, 'auto');
-    console.log('result: ', result);
+    await migrate(argv);
 };

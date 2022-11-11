@@ -6,6 +6,7 @@ export default async (yargs: Argv) => {
     .command('upload', 'upload a smart contract', require('./cmd/upload').default)
     .command('instantiate', 'instantiate a smart contract', require('./cmd/instantiate').default)
     .command('deploy', 'deploy a smart contract using cosmjs', require('./cmd/deploy').default)
+    .command('migrate', 'migrate a smart contract using cosmjs', require('./cmd/migrate').default)
     .command('execute', 'execute a smart contract using cosmjs', require('./cmd/execute').default)
     .command('query', 'query a smart contract using cosmjs', require('./cmd/query').default)
     .option('input', {

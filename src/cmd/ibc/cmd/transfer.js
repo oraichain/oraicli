@@ -56,3 +56,5 @@ export default async (yargs: Argv) => {
     console.log(ex);
   }
 };
+
+// yarn oraicli ibc transfer orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573 --channel channel-19

@@ -50,3 +50,6 @@ export default async (yargs: Argv) => {
   const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, argv.label, 'auto');
   console.log('instantiate result: ', instantiateResult);
 };
+
+// receiver: orai14z590qwj05j0xa5gqalmtm5t9q2avxh0x2c4qv08498dceam0gasssxfah
+// sender: orai1yymkhwl3046xra7d89mwras79f50st35j7ea5qux4yc5lysdcx0q07j3uw

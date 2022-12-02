@@ -33,7 +33,7 @@ export default async (yargs: Argv) => {
     prefix
   });
   const input = JSON.parse(argv.input);
-  const amount = [{ amount: argv.amount, denom }];
+  const amount = argv.amount ? [{ amount: argv.amount, denom }] : undefined;
   const result = await client.execute(firstAccount.address, address, input, 'auto', argv.memo, amount);
   console.log('result: ', result);
 };

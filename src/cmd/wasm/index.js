@@ -2,14 +2,19 @@ import { Argv } from 'yargs';
 export default async (yargs: Argv) => {
   yargs
     .usage('usage: $0 wasm <command> [options]')
-    .command('query', 'query a smart contract', require('./cmd/query-smart').default)
+
     .command('upload', 'upload a smart contract', require('./cmd/upload').default)
     .command('instantiate', 'instantiate a smart contract', require('./cmd/instantiate').default)
-    .command('execute', 'execute a smart contract', require('./cmd/execute').default)
-    .command('deploy', 'deploy a smart contract', require('./cmd/deploy').default)
-    .command('deploy-cosmjs', 'deploy a smart contract using cosmjs', require('./cmd/deploy-cosmjs').default)
-    .command('execute-cosmjs', 'execute a smart contract using cosmjs', require('./cmd/execute-cosmjs').default)
-    .command('query-cosmjs', 'query a smart contract using cosmjs', require('./cmd/query-cosmjs').default)
+    .command('deploy', 'deploy a smart contract using cosmjs', require('./cmd/deploy').default)
+    .command('migrate', 'migrate a smart contract using cosmjs', require('./cmd/migrate').default)
+    .command('execute', 'execute a smart contract using cosmjs', require('./cmd/execute').default)
+    .command('migrate', 'migrate a smart contract', require('./cmd/migrate').default)
+    .command('query', 'query a smart contract using cosmjs', require('./cmd/query').default)
+    .option('admin', {
+      describe: 'the admin to migrate smart contract',
+      default: '',
+      type: 'string'
+    })
     .option('input', {
       describe: 'the input to initilize smart contract',
       default: '{}',

@@ -1,44 +1,30 @@
 import { Argv } from 'yargs';
-import fs from 'fs';
-import Cosmos from '@oraichain/cosmosjs';
-
-const message = Cosmos.message;
-
-const getInstantiateMessage = (code_id, init_msg, sender, label = '', amount = '') => {
-  const sent_funds = amount ? [{ denom: cosmos.bech32MainPrefix, amount }] : null;
-  const msgSend = new message.cosmwasm.wasm.v1beta1.MsgInstantiateContract({
-    code_id,
-    init_msg,
-    label,
-    sender,
-    sent_funds
-  });
-
-  const msgSendAny = new message.google.protobuf.Any({
-    type_url: '/cosmwasm.wasm.v1beta1.MsgInstantiateContract',
-    value: message.cosmwasm.wasm.v1beta1.MsgInstantiateContract.encode(msgSend).finish()
-  });
-
-  return new message.cosmos.tx.v1beta1.TxBody({
-    messages: [msgSendAny]
-  });
-};
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
+import { Decimal } from '@cosmjs/math';
+import { GasPrice } from '@cosmjs/stargate';
 
 export const instantiate = async (argv) => {
-  const { gas, source, codeId } = argv;
-
-  const childKey = cosmos.getChildKey(argv.mnemonic);
-  const sender = cosmos.getAddress(childKey);
+  const { gas, source, codeId, label, admin } = argv;
+  const prefix = process.env.PREFIX || 'orai';
+  const denom = process.env.DENOM || 'orai';
+  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
+    prefix
+  });
+  const [firstAccount] = await wallet.getAccounts();
+  const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL, wallet, {
+    gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
+    prefix
+  });
 
   try {
     // next instantiate code
-    const input = Buffer.from(argv.input).toString('base64');
-    const txBody2 = getInstantiateMessage(codeId, input, sender, argv.label);
-    const res = await cosmos.submit(childKey, txBody2, 'BROADCAST_MODE_BLOCK', isNaN(argv.fees) ? 0 : parseInt(argv.fees), gas);
+    const input = JSON.parse(argv.input);
 
-    console.log(res);
-    const address = JSON.parse(res.tx_response.raw_log)[0].events[1].attributes[0].value;
-    return address;
+    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto', { admin });
+
+    console.log(res.contractAddress);
+    return res.contractAddress;
   } catch (error) {
     console.log('error: ', error);
   }

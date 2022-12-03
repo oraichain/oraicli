@@ -5,7 +5,7 @@ import { Decimal } from '@cosmjs/math';
 import { GasPrice } from '@cosmjs/stargate';
 
 export const instantiate = async (argv) => {
-  const { gas, source, codeId, label } = argv;
+  const { gas, source, codeId, label, admin } = argv;
   const prefix = process.env.PREFIX || 'orai';
   const denom = process.env.DENOM || 'orai';
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
@@ -21,7 +21,7 @@ export const instantiate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto');
+    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto', { admin });
 
     console.log(res.contractAddress);
     return res.contractAddress;

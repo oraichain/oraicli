@@ -15,6 +15,9 @@ export default async (yargs: Argv) => {
     })
     .option('amount', {
       type: 'string'
+    })
+    .option('memo', {
+      type: 'string'
     });
   const [address] = argv._.slice(-1);
   const prefix = process.env.PREFIX || 'orai';
@@ -30,7 +33,7 @@ export default async (yargs: Argv) => {
     prefix
   });
   const input = JSON.parse(argv.input);
-  const amount = [{ amount, denom }];
-  const result = await client.execute(firstAccount.address, address, input, 'auto');
+  const amount = [{ amount: argv.amount, denom }];
+  const result = await client.execute(firstAccount.address, address, input, 'auto', argv.memo, amount);
   console.log('result: ', result);
 };

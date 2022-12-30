@@ -24,7 +24,6 @@ export default async (yargs: Argv) => {
     .option('amount', {
       type: 'string'
     });
-  const [to_address] = argv._.slice(-1);
   const [file] = argv._.slice(-1);
   const prefix = process.env.PREFIX || 'orai';
   const denom = process.env.DENOM || 'orai';
@@ -47,7 +46,7 @@ export default async (yargs: Argv) => {
   const codeId = uploadResult.codeId;
   const input = JSON.parse(argv.input);
 
-  const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, argv.label, 'auto');
+  const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, argv.label, 'auto', { admin: argv.admin });
   console.log('instantiate result: ', instantiateResult);
 };
 

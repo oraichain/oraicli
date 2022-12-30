@@ -10,6 +10,11 @@ export default async (yargs: Argv) => {
     .command('execute', 'execute a smart contract using cosmjs', require('./cmd/execute').default)
     .command('migrate', 'migrate a smart contract', require('./cmd/migrate').default)
     .command('query', 'query a smart contract using cosmjs', require('./cmd/query').default)
+    .option('admin', {
+      describe: 'the admin to migrate smart contract',
+      default: '',
+      type: 'string'
+    })
     .option('input', {
       describe: 'the input to initilize smart contract',
       default: '{}',

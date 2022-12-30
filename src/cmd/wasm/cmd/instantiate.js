@@ -21,7 +21,7 @@ export const instantiate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto');
+    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto', { admin: firstAccount.address });
 
     console.log(res.contractAddress);
     return res.contractAddress;

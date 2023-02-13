@@ -18,7 +18,7 @@ export const upload = async (argv) => {
   });
   const [firstAccount] = await wallet.getAccounts();
   const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL, wallet, {
-    gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
+    gasPrice: GasPrice.fromString(argv.gasPrice),
     prefix
   });
 

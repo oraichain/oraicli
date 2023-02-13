@@ -3,8 +3,6 @@ import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { stringToPath } from '@cosmjs/crypto';
 import * as cosmwasm from '@cosmjs/cosmwasm-stargate';
-import { Decimal } from '@cosmjs/math';
-import { GasPrice } from '@cosmjs/stargate';
 import fs from 'fs';
 
 export default async (yargs: Argv) => {

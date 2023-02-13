@@ -52,6 +52,10 @@ const argv = yargs(hideBin(process.argv))
     default: '',
     type: 'string'
   })
+  .option('gas-price', {
+    type: 'string',
+    default: '0.002orai'
+  })
   .option('gas', {
     type: 'number',
     default: 2000000

@@ -20,17 +20,17 @@ export default async (yargs: Argv) => {
 
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(argv.mnemonic, {
     hdPaths: [stringToPath(process.env.HD_PATH || "m/44'/118'/0'/0/0")],
-    prefix: "orai"
+    prefix: 'orai'
   });
   const [firstAccount] = await wallet.getAccounts();
 
   const client = await SigningStargateClient.connectWithSigner(process.env.RPC_URL || 'https://testnet-rpc.orai.io', wallet, {
-    gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), "orai"),
-    prefix: "orai"
+    gasPrice: GasPrice.fromString(argv.gasPrice),
+    prefix: 'orai'
   });
 
-  console.log("sender address: ", firstAccount.address)
+  console.log('sender address: ', firstAccount.address);
 
-  const result = await client.sendTokens(firstAccount.address, to_address, [{ denom: "orai", amount: amount.toString() }], "auto");
-  console.log("send result: ", result);
+  const result = await client.sendTokens(firstAccount.address, to_address, [{ denom: 'orai', amount: amount.toString() }], 'auto');
+  console.log('send result: ', result);
 };

@@ -14,7 +14,7 @@ export const migrate = async (argv) => {
     });
     const [firstAccount] = await wallet.getAccounts();
     const client = await cosmwasm.SigningCosmWasmClient.connectWithSigner(process.env.RPC_URL, wallet, {
-        gasPrice: new GasPrice(Decimal.fromUserInput('0', 6), denom),
+        gasPrice: GasPrice.fromString(`${process.env.GAS_PRICES}${prefix}`),
         prefix
     });
 
@@ -42,3 +42,5 @@ export default async (yargs: Argv) => {
         });
     await migrate(argv);
 };
+
+// yarn oraicli wasm migrate orai195269awwnt5m6c843q6w7hp8rt0k7syfu9de4h0wz384slshuzps8y7ccm --input '{}' --codeId 815 --env .env.production

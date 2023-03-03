@@ -20,5 +20,5 @@ export default async (yargs: Argv) => {
   const client = await cosmwasm.SigningCosmWasmClient.connect(process.env.RPC_URL);
   const input = JSON.parse(argv.input);
   const queryResult = await client.queryContractSmart(address, input);
-  console.log('query result: ', queryResult);
+  console.log('query result: ', JSON.stringify(queryResult));
 };

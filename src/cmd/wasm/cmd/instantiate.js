@@ -21,7 +21,7 @@ export const instantiate = async (argv) => {
     // next instantiate code
     const input = JSON.parse(argv.input);
 
-    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto', { admin: firstAccount.address });
+    const res = await client.instantiate(firstAccount.address, codeId, input, label, 'auto', { admin: argv.admin });
 
     console.log(res.contractAddress);
     return res.contractAddress;
@@ -46,6 +46,8 @@ export default async (yargs: Argv) => {
       type: 'string'
     })
     .option('amount', {
+      type: 'string'
+    }).option('admin', {
       type: 'string'
     });
 

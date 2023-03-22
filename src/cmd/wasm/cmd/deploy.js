@@ -25,6 +25,10 @@ export default async (yargs: Argv) => {
       'description': 'input',
       type: 'string'
     })
+    .option('codeid', {
+      'description': 'smart contract code-id',
+      type: 'number'
+    })
     .option('amount', {
       type: 'string'
     });
@@ -43,16 +47,20 @@ export default async (yargs: Argv) => {
   });
   const wasmBody = fs.readFileSync(file);
 
-  // update smart contract to collect code id
-  const uploadResult = await client.upload(firstAccount.address, wasmBody, 'auto');
-  console.log('upload result: ', uploadResult);
+  let codeId;
+  if (argv.codeid)
+    codeId = argv.codeid;
+  else {
+    // update smart contract to collect code id
+    const uploadResult = await client.upload(firstAccount.address, wasmBody, 'auto');
+    console.log('upload result: ', uploadResult);
 
-  const codeId = uploadResult.codeId;
+    codeId = uploadResult.codeId;
+  }
   const input = JSON.parse(argv.input);
 
   const instantiateResult = await client.instantiate(firstAccount.address, parseInt(codeId), input, argv.label, 'auto', { admin: argv.admin });
   console.log('instantiate result: ', instantiateResult);
 };
 
-// receiver: orai14z590qwj05j0xa5gqalmtm5t9q2avxh0x2c4qv08498dceam0gasssxfah
-// sender: orai1yymkhwl3046xra7d89mwras79f50st35j7ea5qux4yc5lysdcx0q07j3uw
+// yarn oraicli wasm deploy ../oraiwasm/package/plus/cw4-group/artifacts/cw4-group.wasm --input '{"admin":"orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573","members":[{"addr":"orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573","weight":1}]}' --label 'cw4-group-0132-cosmwasm' --codeid 5613 --admin orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573
